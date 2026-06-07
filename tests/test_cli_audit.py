@@ -24,9 +24,23 @@ def test_cli_audit_writes_required_outputs(tmp_path):
         assert (out / filename).exists()
     with (out / "claims.jsonl").open(encoding="utf-8") as handle:
         for line in handle:
-            validate_claim_record(json.loads(line))
+            record = json.loads(line)
+            validate_claim_record(record)
+            assert {"claim_domain", "claim_importance", "review_action", "extraction_quality"} <= set(record)
     manifest = json.loads((out / "run_manifest.json").read_text(encoding="utf-8"))
     assert "verdict_counts" in manifest
+    report = (out / "claims_report.md").read_text(encoding="utf-8")
+    headings = [
+        "## Executive Summary",
+        "## Verdict Summary",
+        "## Domain Summary",
+        "## Priority Findings",
+        "## High-Importance Claims Requiring Action",
+        "## Claims Grouped by Domain",
+        "## Full Claim Listing",
+    ]
+    positions = [report.index(heading) for heading in headings]
+    assert positions == sorted(positions)
 
 
 def test_low_claim_repo_writes_no_claim_outputs(tmp_path):
@@ -43,4 +57,3 @@ def test_low_claim_repo_writes_no_claim_outputs(tmp_path):
     }
     report = (out / "claims_report.md").read_text(encoding="utf-8")
     assert "No substantial auditable repository claims were found" in report
-

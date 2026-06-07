@@ -52,3 +52,23 @@ Example: The repository is reviewable by another engineer.
 
 A claim-like statement that does not fit the above categories.
 
+## Claim domains
+
+Claim records also carry `claim_domain` so report generation can separate unlike claims that share a `claim_type`.
+
+- `licensing_rights`: license, copyright, permissions, and rights statements.
+- `dataset_redistribution`: dataset or third-party source-data redistribution statements.
+- `artifact_distribution`: model weights, checkpoints, tensor corpora, manifests, prediction exports, or similar artifact availability statements.
+- `model_performance`: metrics, evaluation, validation, training, or scientific/model-performance statements.
+- `generalisation_scope`: transfer, real-world, production, robustness, limitations, and scope caveats.
+- `technical_capability`, `runtime_behavior`, `architecture`, `documentation_policy`, `process_traceability`, `adoption_usability`, and `other`: implementation, runtime, structure, policy, process, usability, or fallback domains.
+
+This distinction is especially important for `bounded_non_claim`: a rights limitation, a dataset redistribution limitation, a generalisation caveat, and a documentation policy instruction should not be reported as the same class of finding.
+
+## Report metadata
+
+Each claim record includes:
+
+- `claim_importance`: `high`, `medium`, or `low`.
+- `review_action`: the recommended review treatment, such as adding evidence, narrowing a claim, clarifying wording, human review, keeping evidence linked, no action, or ignoring a low-quality extraction.
+- `extraction_quality`: whether the extracted text is an audit-ready claim, bounded context, caveat/scope note, policy statement, metric data point, heading/label, incomplete fragment, code/error fragment, or other low-quality extraction.

@@ -8,6 +8,10 @@
     "claim_id",
     "claim_text",
     "claim_type",
+    "claim_domain",
+    "claim_importance",
+    "review_action",
+    "extraction_quality",
     "source_file",
     "source_location",
     "required_evidence",
@@ -37,6 +41,54 @@
         "process_claim",
         "adoption_usability_claim",
         "other_claim"
+      ]
+    },
+    "claim_domain": {
+      "type": "string",
+      "enum": [
+        "technical_capability",
+        "model_performance",
+        "runtime_behavior",
+        "architecture",
+        "generalisation_scope",
+        "licensing_rights",
+        "dataset_redistribution",
+        "artifact_distribution",
+        "documentation_policy",
+        "process_traceability",
+        "adoption_usability",
+        "other"
+      ]
+    },
+    "claim_importance": {
+      "type": "string",
+      "enum": ["high", "medium", "low"]
+    },
+    "review_action": {
+      "type": "string",
+      "enum": [
+        "no_action",
+        "keep_evidence_linked",
+        "add_missing_evidence",
+        "add_evidence_or_remove_claim",
+        "narrow_or_remove_claim",
+        "clarify_claim_wording",
+        "human_review_required",
+        "ignore_low_quality_extraction"
+      ]
+    },
+    "extraction_quality": {
+      "type": "string",
+      "enum": [
+        "auditable_claim",
+        "bounded_context",
+        "caveat_or_scope_note",
+        "policy_statement",
+        "metric_data_point",
+        "heading_or_label",
+        "incomplete_fragment",
+        "code_or_error_fragment",
+        "other_low_quality"
       ]
     },
     "source_file": { "type": "string", "minLength": 1 },
@@ -170,4 +222,3 @@
     }
   }
 }
-

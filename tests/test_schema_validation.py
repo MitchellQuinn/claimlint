@@ -8,6 +8,10 @@ def valid_claim_record():
         "claim_id": "claim_001",
         "claim_text": "The selected model achieved 0.015856 m synthetic validation MAE.",
         "claim_type": "metric_claim",
+        "claim_domain": "model_performance",
+        "claim_importance": "high",
+        "review_action": "keep_evidence_linked",
+        "extraction_quality": "auditable_claim",
         "claim_surface_status": "high_claim_surface",
         "source_file": "README.md",
         "source_location": "section: Results",
@@ -55,4 +59,3 @@ def test_invalid_verification_mode_fails():
     record["verification_mode"] = "quick_metric_check"
     with pytest.raises(SchemaValidationError):
         validate_claim_record(record)
-

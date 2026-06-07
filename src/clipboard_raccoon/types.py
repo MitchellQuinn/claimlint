@@ -38,6 +38,9 @@ class CandidateClaim:
 class ClassifiedClaim:
     claim: CandidateClaim
     claim_type: str
+    claim_domain: str
+    claim_importance: str
+    extraction_quality: str
     claim_surface_status: str
     required_evidence: list[str]
     requires_external_environment: bool
@@ -47,4 +50,3 @@ class ClassifiedClaim:
 class ManifestSelection:
     input_files: list[InputFile]
     warnings: list[str]
-

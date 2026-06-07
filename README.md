@@ -4,6 +4,8 @@ ClaimLint turns repository claims into structured, checkable evidence objects.
 
 v0.1 is a small, deterministic repository claim auditor. It reads selected repository documentation and artifacts, extracts explicit claims, searches the selected corpus for evidence, records missing evidence and artifact gaps, and renders JSONL plus Markdown outputs.
 
+Current status: v0.1 proof of concept. Output quality is expected to vary; the current goal is to demonstrate the workflow contract and evidence-bounded report structure.
+
 ## What it solves
 
 Technical repositories often make claims about capabilities, metrics, runtime behaviour, architecture, or reviewability without linking those claims to inspectable artifacts. ClaimLint makes that gap explicit. It does not decide whether a project is good; it records what the selected repository evidence can and cannot support.
