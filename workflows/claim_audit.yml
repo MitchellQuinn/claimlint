@@ -32,6 +32,13 @@ outputs:
     path: run_manifest.json
     schema: schemas/run_manifest.schema.json
 
+agent_preflight:
+  - id: clear_tmp_before_clone
+    description: >
+      When an agent materializes the target repository by cloning it for this workflow,
+      delete stale entries from ./tmp before cloning so prior run state cannot
+      contaminate the audit.
+
 stages:
   - id: ingest_files
     description: Load manifest-selected files and split them into traceable chunks.

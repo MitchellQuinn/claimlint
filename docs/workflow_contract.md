@@ -17,6 +17,10 @@ The workflow audits selected technical repository documentation and artifacts fo
 - `evidence_packet.md`
 - `run_manifest.json`
 
+## Agent Preflight
+
+When an agent materializes the target repository by cloning it for this workflow, it must delete stale entries from `./tmp` before cloning so prior run state cannot contaminate the audit.
+
 ## Stages
 
 1. Ingest files from the manifest.
