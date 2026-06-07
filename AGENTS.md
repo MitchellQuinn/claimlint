@@ -35,3 +35,6 @@ Before finishing implementation work, run tests and ensure the CLI produces:
 - evidence_packet.md
 - run_manifest.json
 
+When running ClaimLint audits, do not pass `--out` unless the user explicitly
+requests a different output root. By default, audit artifacts must be written
+under `./output` via the CLI default.
