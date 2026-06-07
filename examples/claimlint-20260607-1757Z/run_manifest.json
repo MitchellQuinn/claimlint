@@ -1,0 +1,403 @@
+{
+  "adapter_status": {
+    "claude_code": {
+      "notes": "Adapter files provided, but end-to-end Claude Code execution has not yet been verified.",
+      "status": "untested"
+    },
+    "codex": {
+      "notes": "Adapter files provided, but end-to-end Codex execution has not yet been verified.",
+      "status": "untested"
+    },
+    "local_backend": {
+      "notes": "Local model backend is planned for a later stage.",
+      "status": "planned"
+    }
+  },
+  "claim_count": 17,
+  "command_args": {
+    "command": "audit",
+    "manifest": "examples/claimlint-self-audit/claimlint-github-manifest.yml",
+    "out": "../../output",
+    "repo": "."
+  },
+  "completed_at": "2026-06-07T17:57:33+00:00",
+  "input_files": [
+    {
+      "extract_claims": true,
+      "path": "README.md",
+      "role": "primary_readme",
+      "sha256": "40fe0f63dfc955162c0d7bcd63285ed40706d500d86e179095c2569952cbb46b",
+      "size_bytes": 3381,
+      "source_role": "claim_source",
+      "use_as_evidence": true
+    },
+    {
+      "extract_claims": false,
+      "path": "adapters/claude-code/README.md",
+      "role": "adapter_documentation",
+      "sha256": "d9704ff90f24c4da21b0b01d2e29a8798c8f2543d5d38cf636b4cc9334b4be5b",
+      "size_bytes": 471,
+      "source_role": "adapter_contract",
+      "use_as_evidence": true
+    },
+    {
+      "extract_claims": false,
+      "path": "adapters/codex/README.md",
+      "role": "adapter_documentation",
+      "sha256": "aa30e1139fd1ccbfdba5f75fd8d536d43618a603e95ab2522ba4361ae1b24ae3",
+      "size_bytes": 453,
+      "source_role": "adapter_contract",
+      "use_as_evidence": true
+    },
+    {
+      "extract_claims": false,
+      "path": "adapters/status.yml",
+      "role": "adapter_status",
+      "sha256": "8d9c1f7c3c76783f864c4a3006d8322a43aabe17c879efa2185f3bb563122748",
+      "size_bytes": 359,
+      "source_role": "adapter_contract",
+      "use_as_evidence": true
+    },
+    {
+      "extract_claims": false,
+      "path": "docs/adapter_contract.md",
+      "role": "adapter_contract",
+      "sha256": "618e3f279e056e4985d2371052a3aebe97b18959e5df77386e1b121435bf1ea7",
+      "size_bytes": 401,
+      "source_role": "adapter_contract",
+      "use_as_evidence": true
+    },
+    {
+      "extract_claims": true,
+      "path": "docs/architecture.md",
+      "role": "architecture_documentation",
+      "sha256": "a572e52e2b0381760503fd6cb061e7d417d54049d6ed1b1cfbb8b4155144f315",
+      "size_bytes": 988,
+      "source_role": "claim_source",
+      "use_as_evidence": true
+    },
+    {
+      "extract_claims": false,
+      "path": "docs/claim_taxonomy.md",
+      "role": "reference",
+      "sha256": "e48cd584bc11d2ed4fa7ddd74a2e73e9651f1b5e154b72e32abc4bdd135941fc",
+      "size_bytes": 3526,
+      "source_role": "reference_only",
+      "use_as_evidence": true
+    },
+    {
+      "extract_claims": false,
+      "path": "docs/environment.md",
+      "role": "environment_notes",
+      "sha256": "30dfce13909d3a47bc7a5441f3a5bee3eede88ca5b5ee5e887ed9d67612d61b5",
+      "size_bytes": 1995,
+      "source_role": "reference_only",
+      "use_as_evidence": true
+    },
+    {
+      "extract_claims": false,
+      "path": "docs/implementation_map.md",
+      "role": "implementation_map",
+      "sha256": "fd25a8aff4cd59dc80715366c2041188f962cf5dfcd70a5bbc6001323fd12832",
+      "size_bytes": 4627,
+      "source_role": "reference_only",
+      "use_as_evidence": true
+    },
+    {
+      "extract_claims": false,
+      "path": "docs/manifest_contract.md",
+      "role": "runtime_contract",
+      "sha256": "d6a469b94a9518d64abafdd145e739dd01485d3357ad6503e9d7837455e8ce63",
+      "size_bytes": 2077,
+      "source_role": "runtime_contract",
+      "use_as_evidence": true
+    },
+    {
+      "extract_claims": false,
+      "path": "docs/runtime_contract.md",
+      "role": "runtime_contract",
+      "sha256": "fe0be46ffd3415c2750be4349768bd0fd5c91c41dcc84dd4564789e6cf81bc39",
+      "size_bytes": 1350,
+      "source_role": "runtime_contract",
+      "use_as_evidence": true
+    },
+    {
+      "extract_claims": false,
+      "path": "docs/verdict_rules.md",
+      "role": "reference",
+      "sha256": "1c6ebcc991487f29b011c75a098d6b84554854358f977474699e4857e9bd431f",
+      "size_bytes": 1266,
+      "source_role": "reference_only",
+      "use_as_evidence": true
+    },
+    {
+      "extract_claims": false,
+      "path": "docs/workflow_contract.md",
+      "role": "workflow_contract",
+      "sha256": "42abaab1178da3fda427b0d234b8d6339d0185b9c6484acb3e9cb2d6e4a24174",
+      "size_bytes": 1452,
+      "source_role": "workflow_contract",
+      "use_as_evidence": true
+    },
+    {
+      "extract_claims": false,
+      "path": "examples/claimlint-self-audit/claimlint-github-manifest.yml",
+      "role": "self_audit_config",
+      "sha256": "52c6af637ec99a26ca78e4a14f76ee08df480fafe3e77111f24951c72529e007",
+      "size_bytes": 3130,
+      "source_role": "reference_only",
+      "use_as_evidence": true
+    },
+    {
+      "extract_claims": false,
+      "path": "examples/claimlint-self-audit/smoke_test.md",
+      "role": "smoke_test",
+      "sha256": "a570dc5ea37b4f14b45d42f25481287534960407736031fcdfdc69efe45ccc55",
+      "size_bytes": 1790,
+      "source_role": "reference_only",
+      "use_as_evidence": true
+    },
+    {
+      "extract_claims": false,
+      "path": "pyproject.toml",
+      "role": "project_config",
+      "sha256": "f24bdc7e51d5843a2a404172ff6657b79d914e17a6fcff7b458c02af9d1e81c7",
+      "size_bytes": 467,
+      "source_role": "reference_only",
+      "use_as_evidence": true
+    },
+    {
+      "extract_claims": false,
+      "path": "schemas/audit_summary.schema.json",
+      "role": "schema_reference",
+      "sha256": "8f093f5e3f2dc2f24736b5e1e394092ca5451976ab5f7d9f8a1f6cc6ab0c229e",
+      "size_bytes": 817,
+      "source_role": "schema_reference",
+      "use_as_evidence": true
+    },
+    {
+      "extract_claims": false,
+      "path": "schemas/claim_record.schema.json",
+      "role": "schema_reference",
+      "sha256": "aff4ffd8d3f093a550268825d4fb417c9286c01b04dba0a02a40854f5e023373",
+      "size_bytes": 7079,
+      "source_role": "schema_reference",
+      "use_as_evidence": true
+    },
+    {
+      "extract_claims": false,
+      "path": "schemas/run_manifest.schema.json",
+      "role": "schema_reference",
+      "sha256": "631a22d18960bf6587f6738e3eb40d12c392c3df845b9dc2db6f9ef169b3b305",
+      "size_bytes": 2785,
+      "source_role": "schema_reference",
+      "use_as_evidence": true
+    },
+    {
+      "extract_claims": false,
+      "path": "src/claimlint/__init__.py",
+      "role": "source_code",
+      "sha256": "43765dae7a3718a5cae593037b25ffc17d51aabbb68650dc8e98058689b2a687",
+      "size_bytes": 58,
+      "source_role": "source_code",
+      "use_as_evidence": true
+    },
+    {
+      "extract_claims": false,
+      "path": "src/claimlint/classify_claims.py",
+      "role": "source_code",
+      "sha256": "436dde643fe915a77e965e3ba544ccbc11ff5d0e4e1fb4b1978fc49bf957b9f7",
+      "size_bytes": 16737,
+      "source_role": "source_code",
+      "use_as_evidence": true
+    },
+    {
+      "extract_claims": false,
+      "path": "src/claimlint/cli.py",
+      "role": "source_code",
+      "sha256": "12edfaf306f0a799a3fd9ddfbecd40099d5add5743a7793740243dec77080127",
+      "size_bytes": 5784,
+      "source_role": "source_code",
+      "use_as_evidence": true
+    },
+    {
+      "extract_claims": false,
+      "path": "src/claimlint/extract_claims.py",
+      "role": "source_code",
+      "sha256": "567712af4affa2748444d1c163381414e6eb5227fb7885035a62539f09c67865",
+      "size_bytes": 9280,
+      "source_role": "source_code",
+      "use_as_evidence": true
+    },
+    {
+      "extract_claims": false,
+      "path": "src/claimlint/ingest_markdown.py",
+      "role": "source_code",
+      "sha256": "44d4b0892285787d90fe833a2b2b45684adfd4bc278ed133be906c6a003208eb",
+      "size_bytes": 3655,
+      "source_role": "source_code",
+      "use_as_evidence": true
+    },
+    {
+      "extract_claims": false,
+      "path": "src/claimlint/judge_support.py",
+      "role": "source_code",
+      "sha256": "d598f567943d82f1f5a6d78bcfb32fc9bc523cb7e8913ae4418edcea901bb672",
+      "size_bytes": 22962,
+      "source_role": "source_code",
+      "use_as_evidence": true
+    },
+    {
+      "extract_claims": false,
+      "path": "src/claimlint/manifest.py",
+      "role": "source_code",
+      "sha256": "aabc8a66591934dcd52542735315e1c06e7411c618f95ab6b38688dbf494b2fe",
+      "size_bytes": 9581,
+      "source_role": "source_code",
+      "use_as_evidence": true
+    },
+    {
+      "extract_claims": false,
+      "path": "src/claimlint/model_backends.py",
+      "role": "source_code",
+      "sha256": "b44b82a3decda6ae4b2c8220f677589649d989ebb094fb7f6753738959810669",
+      "size_bytes": 771,
+      "source_role": "source_code",
+      "use_as_evidence": true
+    },
+    {
+      "extract_claims": false,
+      "path": "src/claimlint/render_report.py",
+      "role": "source_code",
+      "sha256": "cce48411ad5c8046df71a96763b9cba5e168b3e1dc89a69208223b682ef3404f",
+      "size_bytes": 23240,
+      "source_role": "source_code",
+      "use_as_evidence": true
+    },
+    {
+      "extract_claims": false,
+      "path": "src/claimlint/retrieve_evidence.py",
+      "role": "source_code",
+      "sha256": "aa6af19fecae493f6df633c379109f2a5181b53a712d3dec30aedf9f86770143",
+      "size_bytes": 6086,
+      "source_role": "source_code",
+      "use_as_evidence": true
+    },
+    {
+      "extract_claims": false,
+      "path": "src/claimlint/run_manifest.py",
+      "role": "source_code",
+      "sha256": "f4fdb5e87a071c74f9a3fe6cebc520d3e7357b41d9ad3c052d30c3bb727d3d6b",
+      "size_bytes": 3874,
+      "source_role": "source_code",
+      "use_as_evidence": true
+    },
+    {
+      "extract_claims": false,
+      "path": "src/claimlint/schemas.py",
+      "role": "source_code",
+      "sha256": "dc4c35e43a77bab26c8ba9b363bb1b3f3fd9f669d349616987bc044d52a9a62d",
+      "size_bytes": 1392,
+      "source_role": "source_code",
+      "use_as_evidence": true
+    },
+    {
+      "extract_claims": false,
+      "path": "src/claimlint/types.py",
+      "role": "source_code",
+      "sha256": "7fc465ae86a0cdc0233b33e32919f6699a45477231dc34d2637c70c67716e819",
+      "size_bytes": 1260,
+      "source_role": "source_code",
+      "use_as_evidence": true
+    },
+    {
+      "extract_claims": false,
+      "path": "tests/test_claim_extraction.py",
+      "role": "smoke_test",
+      "sha256": "96702dad0a8df158bb7002cbd535eba5aafd8a28b6c6c5b8cb249e668ce45aa3",
+      "size_bytes": 6959,
+      "source_role": "test_fixture",
+      "use_as_evidence": true
+    },
+    {
+      "extract_claims": false,
+      "path": "tests/test_cli_audit.py",
+      "role": "smoke_test",
+      "sha256": "7eb309a1d983fda79d92fa795d780484ab754e948ad183e7e3655e8aa62577fd",
+      "size_bytes": 4462,
+      "source_role": "test_fixture",
+      "use_as_evidence": true
+    },
+    {
+      "extract_claims": false,
+      "path": "tests/test_ingest_markdown.py",
+      "role": "smoke_test",
+      "sha256": "a92ac5a7ddeb879d5a1ac90f6a2fa5a9b0c89bd536a1779d5d788835fdb9eb64",
+      "size_bytes": 4582,
+      "source_role": "test_fixture",
+      "use_as_evidence": true
+    },
+    {
+      "extract_claims": false,
+      "path": "tests/test_render_report.py",
+      "role": "smoke_test",
+      "sha256": "1529e8ea7ec76a41d11a6bcca76629b58ab09f24277602de85401ecdcedf7b24",
+      "size_bytes": 3598,
+      "source_role": "test_fixture",
+      "use_as_evidence": true
+    },
+    {
+      "extract_claims": false,
+      "path": "tests/test_retrieve_evidence.py",
+      "role": "smoke_test",
+      "sha256": "3d9f188b261661a4d14c606deb05e8b99400f4524bcc43475fe9c93076fce130",
+      "size_bytes": 2115,
+      "source_role": "test_fixture",
+      "use_as_evidence": true
+    },
+    {
+      "extract_claims": false,
+      "path": "tests/test_schema_validation.py",
+      "role": "smoke_test",
+      "sha256": "d1b2a6fee4ad27ca2fbb1daf710dfa762872b401e1b45ab9e6abf5ca1d3687fd",
+      "size_bytes": 3000,
+      "source_role": "test_fixture",
+      "use_as_evidence": true
+    },
+    {
+      "extract_claims": false,
+      "path": "workflows/claim_audit.yml",
+      "role": "workflow_contract",
+      "sha256": "bf52186dbf123bb3c09a6b0146fffd6e9812ccaeb5224a1ae27537b9278c3421",
+      "size_bytes": 2579,
+      "source_role": "workflow_contract",
+      "use_as_evidence": true
+    }
+  ],
+  "manifest_path": "examples/claimlint-self-audit/claimlint-github-manifest.yml",
+  "manifest_warnings": [],
+  "output_dir": "../../output/claimlint-20260607-1757Z",
+  "outputs": {
+    "claims_jsonl": "../../output/claimlint-20260607-1757Z/claims.jsonl",
+    "claims_report": "../../output/claimlint-20260607-1757Z/claims_report.md",
+    "evidence_packet": "../../output/claimlint-20260607-1757Z/evidence_packet.md",
+    "remediation_tasks": "../../output/claimlint-20260607-1757Z/remediation_tasks.md",
+    "run_manifest": "../../output/claimlint-20260607-1757Z/run_manifest.json"
+  },
+  "repo_path": ".",
+  "repository_claim_surface_status": "high_claim_surface",
+  "schemas": {
+    "audit_summary": "schemas/audit_summary.schema.json",
+    "claim_record": "schemas/claim_record.schema.json",
+    "run_manifest": "schemas/run_manifest.schema.json"
+  },
+  "started_at": "2026-06-07T17:57:32+00:00",
+  "tool_name": "claimlint",
+  "tool_version": "0.1.0",
+  "verdict_counts": {
+    "ambiguous": 9,
+    "supported": 8
+  },
+  "workflow_id": "claimlint.claim-audit",
+  "workflow_version": "0.1.0"
+}
