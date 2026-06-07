@@ -1,0 +1,23 @@
+# Implementation Map
+
+This map links the runtime contract and canonical workflow stages to the `src/claimlint/` implementation. It is evidence for how the implementation satisfies the workflow and runtime contracts; it does not redefine either contract.
+
+| Runtime contract behavior or workflow stage | Implementation modules | Evidence notes |
+| --- | --- | --- |
+| CLI orchestration | `src/claimlint/cli.py` | Defines `claimlint audit`, validates `--repo` and `--manifest`, applies the default `--out output`, calls each audit stage, handles exit codes, validates schemas, renders outputs, and writes debug traces. |
+| Manifest loading and validation | `src/claimlint/manifest.py`, `src/claimlint/types.py` | Loads YAML manifests, applies include and exclude configuration, enforces supported file types and limits, preserves `source_role`, `extract_claims`, and `use_as_evidence`, and records manifest warnings. |
+| `ingest_files` | `src/claimlint/ingest_markdown.py`, `src/claimlint/types.py` | Reads manifest-selected files from the local repository and creates traceable `DocumentChunk` records with path, line range, heading path, SHA-256 hash, extraction flag, and evidence flag. |
+| `extract_claims` | `src/claimlint/extract_claims.py`, `src/claimlint/types.py` | Extracts candidate claims only from chunks where `extract_claims` is true, uses deterministic claim-signal heuristics, keeps source file and line-location metadata, and skips code or low-quality fragments. |
+| `classify_claim_types` | `src/claimlint/classify_claims.py`, `src/claimlint/types.py` | Classifies claim type, claim domain, claim importance, extraction quality, claim-surface status, external-environment requirement, and required evidence. |
+| `define_required_evidence` | `src/claimlint/classify_claims.py` | Maps each claim type and bounded domain to explicit required evidence such as implementation, configuration, smoke test, environment notes, source tree evidence, architecture documentation, or test evidence. |
+| `retrieve_evidence` | `src/claimlint/retrieve_evidence.py`, `src/claimlint/ingest_markdown.py` | Searches only chunks where `use_as_evidence` is true, scores token overlap against the claim and required evidence, applies role/path boosts, labels evidence type such as implementation, config, test, trace, metric, manifest, or documentation, and returns line-referenced snippets. |
+| `judge_support` | `src/claimlint/judge_support.py` | Builds claim records, checks whether each evidence requirement is covered, records missing evidence, records artifact gaps, assigns verification mode, verdict, confidence, risk, review action, and recommended remediation. |
+| `identify_missing_evidence` | `src/claimlint/judge_support.py` | Emits one missing-evidence object for each unmet required evidence item with reason, severity, and suggested fix. |
+| `identify_artifact_gaps` | `src/claimlint/judge_support.py` | Converts missing major evidence into artifact gaps such as config, trace, reproduction steps, model artifact, metrics file, architecture doc, or external environment notes. |
+| `generate_remediation` | `src/claimlint/judge_support.py`, `src/claimlint/render_report.py` | Produces remediation text in claim records and renders action-oriented grouped remediation tasks. |
+| `render_outputs` | `src/claimlint/render_report.py`, `src/claimlint/schemas.py` | Writes `claims.jsonl`, `claims_report.md`, `remediation_tasks.md`, `evidence_packet.md`, and `run_manifest.json`; validates claim records before writing JSONL. |
+| Run manifest creation | `src/claimlint/run_manifest.py`, `src/claimlint/schemas.py` | Builds run metadata with tool and workflow identity, timestamps, normalized repository-relative paths, selected input files, manifest warnings, verdict counts, repository claim-surface status, schema references, adapter status, and output paths. |
+| Schema validation | `src/claimlint/schemas.py`, `schemas/claim_record.schema.json`, `schemas/run_manifest.schema.json`, `schemas/audit_summary.schema.json` | Loads repository schemas and validates claim records and run manifests before successful completion. |
+| Model backend boundary | `src/claimlint/model_backends.py`, `docs/environment.md` | Keeps future backend abstraction separate from v0.1 deterministic runtime behavior; the default audit path does not require network, API, or model inference. |
+
+The implementation keeps workflow contract, runtime contract, adapter files, and implementation modules separate. Agent adapters under `adapters/` point to the workflow and runtime contract and do not provide an alternate CLI.
