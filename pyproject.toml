@@ -1,0 +1,22 @@
+[project]
+name = "clipboard-raccoon"
+version = "0.1.0"
+description = "Evidence-bounded repository claim auditor"
+requires-python = ">=3.11"
+dependencies = [
+  "PyYAML>=6.0",
+  "jsonschema>=4.0"
+]
+
+[project.scripts]
+clipboard-raccoon = "clipboard_raccoon.cli:main"
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0"
+]
+
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+

@@ -1,0 +1,13 @@
+version: 0.1
+
+include:
+  - path: README.md
+    role: primary_readme
+
+exclude:
+  - glob: .git/**
+
+limits:
+  max_file_bytes: 500000
+  max_total_files: 20
+

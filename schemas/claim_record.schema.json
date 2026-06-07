@@ -1,0 +1,173 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/clipboard-raccoon/claim_record.schema.json",
+  "title": "ClaimLint Claim Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "claim_id",
+    "claim_text",
+    "claim_type",
+    "source_file",
+    "source_location",
+    "required_evidence",
+    "found_evidence",
+    "missing_evidence",
+    "artifact_gaps",
+    "verification_mode",
+    "requires_external_environment",
+    "claim_surface_status",
+    "verdict",
+    "confidence",
+    "risk",
+    "recommended_remediation"
+  ],
+  "properties": {
+    "claim_id": { "type": "string", "minLength": 1 },
+    "claim_text": { "type": "string", "minLength": 1 },
+    "claim_type": {
+      "type": "string",
+      "enum": [
+        "capability_claim",
+        "metric_claim",
+        "runtime_claim",
+        "architecture_claim",
+        "generalisation_claim",
+        "bounded_non_claim",
+        "process_claim",
+        "adoption_usability_claim",
+        "other_claim"
+      ]
+    },
+    "source_file": { "type": "string", "minLength": 1 },
+    "source_location": { "type": "string", "minLength": 1 },
+    "required_evidence": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "found_evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "summary", "strength", "evidence_type"],
+        "properties": {
+          "path": { "type": "string", "minLength": 1 },
+          "location": { "type": "string" },
+          "summary": { "type": "string", "minLength": 1 },
+          "strength": {
+            "type": "string",
+            "enum": ["strong", "moderate", "weak", "contradictory", "unclear"]
+          },
+          "evidence_type": {
+            "type": "string",
+            "enum": [
+              "documentation",
+              "implementation",
+              "test",
+              "metric",
+              "config",
+              "trace",
+              "manifest",
+              "incident_report",
+              "model_artifact",
+              "dataset_manifest",
+              "run_log",
+              "external_reference",
+              "other"
+            ]
+          },
+          "snippet": { "type": "string" },
+          "start_line": { "type": "integer", "minimum": 1 },
+          "end_line": { "type": "integer", "minimum": 1 },
+          "score": { "type": "number" }
+        }
+      }
+    },
+    "missing_evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["requirement", "reason_missing"],
+        "properties": {
+          "requirement": { "type": "string", "minLength": 1 },
+          "reason_missing": { "type": "string", "minLength": 1 },
+          "suggested_fix": { "type": "string" },
+          "severity": { "type": "string", "enum": ["blocking", "major", "minor"] }
+        }
+      }
+    },
+    "artifact_gaps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["artifact_type", "description", "impact"],
+        "properties": {
+          "artifact_type": {
+            "type": "string",
+            "enum": [
+              "metrics_file",
+              "test",
+              "trace",
+              "example_output",
+              "model_card",
+              "config",
+              "dataset_manifest",
+              "run_log",
+              "architecture_doc",
+              "reproduction_steps",
+              "model_artifact",
+              "external_environment_notes",
+              "other"
+            ]
+          },
+          "description": { "type": "string", "minLength": 1 },
+          "impact": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "verification_mode": {
+      "type": "string",
+      "enum": [
+        "documentation_review",
+        "artifact_presence_review",
+        "reproducibility_review",
+        "smoke_test",
+        "metric_reproduction",
+        "external_environment_required",
+        "human_review_required",
+        "not_verifiable_from_available_material"
+      ]
+    },
+    "requires_external_environment": { "type": "boolean" },
+    "claim_surface_status": {
+      "type": "string",
+      "enum": [
+        "high_claim_surface",
+        "medium_claim_surface",
+        "low_claim_surface",
+        "requires_external_environment"
+      ]
+    },
+    "verdict": {
+      "type": "string",
+      "enum": [
+        "supported",
+        "partially_supported",
+        "unsupported",
+        "ambiguous",
+        "overclaimed",
+        "needs_human_review"
+      ]
+    },
+    "confidence": { "type": "string", "enum": ["high", "medium", "low"] },
+    "risk": { "type": "string" },
+    "recommended_remediation": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}
+

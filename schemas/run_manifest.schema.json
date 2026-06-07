@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/clipboard-raccoon/run_manifest.schema.json",
+  "title": "ClaimLint Run Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "tool_name",
+    "tool_version",
+    "workflow_id",
+    "workflow_version",
+    "started_at",
+    "completed_at",
+    "repo_path",
+    "manifest_path",
+    "output_dir",
+    "command_args",
+    "input_files",
+    "manifest_warnings",
+    "claim_count",
+    "verdict_counts",
+    "repository_claim_surface_status",
+    "schemas",
+    "adapter_status",
+    "outputs"
+  ],
+  "properties": {
+    "tool_name": { "type": "string" },
+    "tool_version": { "type": "string" },
+    "workflow_id": { "type": "string" },
+    "workflow_version": { "type": "string" },
+    "started_at": { "type": "string" },
+    "completed_at": { "type": "string" },
+    "repo_path": { "type": "string" },
+    "manifest_path": { "type": "string" },
+    "output_dir": { "type": "string" },
+    "command_args": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "input_files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "role", "size_bytes", "sha256"],
+        "properties": {
+          "path": { "type": "string" },
+          "role": { "type": "string" },
+          "size_bytes": { "type": "integer", "minimum": 0 },
+          "sha256": { "type": "string" }
+        }
+      }
+    },
+    "manifest_warnings": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "claim_count": { "type": "integer", "minimum": 0 },
+    "verdict_counts": {
+      "type": "object",
+      "additionalProperties": { "type": "integer", "minimum": 0 }
+    },
+    "repository_claim_surface_status": {
+      "type": "string",
+      "enum": [
+        "high_claim_surface",
+        "medium_claim_surface",
+        "low_claim_surface",
+        "no_auditable_claims_found",
+        "requires_external_environment"
+      ]
+    },
+    "schemas": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "adapter_status": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "outputs": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    }
+  }
+}
+

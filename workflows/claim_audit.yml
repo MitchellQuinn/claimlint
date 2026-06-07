@@ -1,0 +1,74 @@
+id: clipboard-raccoon.claim-audit
+version: 0.1.0
+description: >
+  Audit selected technical repository documentation and artifacts for evidence-bounded claims.
+
+inputs:
+  repo_path:
+    type: path
+    required: true
+    description: Local repository folder to audit.
+
+  input_manifest:
+    type: yaml
+    required: true
+    description: Manifest listing files/globs to include in the audit corpus.
+
+outputs:
+  claims_jsonl:
+    path: claims.jsonl
+    schema: schemas/claim_record.schema.json
+
+  claims_report:
+    path: claims_report.md
+
+  remediation_tasks:
+    path: remediation_tasks.md
+
+  evidence_packet:
+    path: evidence_packet.md
+
+  run_manifest:
+    path: run_manifest.json
+    schema: schemas/run_manifest.schema.json
+
+stages:
+  - id: ingest_files
+    description: Load manifest-selected files and split them into traceable chunks.
+
+  - id: extract_claims
+    description: Extract candidate claim statements from ingested chunks.
+
+  - id: classify_claim_types
+    description: Classify each candidate claim using the claim taxonomy.
+
+  - id: define_required_evidence
+    description: Define what evidence would be required to support each claim.
+
+  - id: retrieve_evidence
+    description: Search ingested chunks for candidate supporting or contradictory evidence.
+
+  - id: judge_support
+    description: Assign support verdicts based on claim text, required evidence, found evidence, missing evidence, and artifact gaps.
+
+  - id: identify_missing_evidence
+    description: Record evidence needed but not found.
+
+  - id: identify_artifact_gaps
+    description: Record missing repository artifacts that prevent or weaken verification.
+
+  - id: generate_remediation
+    description: Suggest concrete fixes for unsupported, partial, ambiguous, overclaimed, or inconveniently evidenced claims.
+
+  - id: render_outputs
+    description: Render JSONL and Markdown outputs.
+
+non_goals:
+  - full GitHub bot
+  - automatic pull request writer
+  - full arbitrary repository crawler
+  - legal/compliance certification
+  - fully autonomous self-improvement
+  - local model fine-tuning
+  - general AI auditor claim
+

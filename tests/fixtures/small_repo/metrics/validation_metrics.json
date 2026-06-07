@@ -1,0 +1,7 @@
+{
+  "synthetic_validation_mae": 0.015856,
+  "unit": "m",
+  "dataset": "synthetic_validation_split_v1",
+  "evaluation_protocol": "fixed synthetic validation evaluation"
+}
+

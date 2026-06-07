@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/clipboard-raccoon/audit_summary.schema.json",
+  "title": "ClaimLint Audit Summary",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "claim_count",
+    "verdict_counts",
+    "repository_claim_surface_status"
+  ],
+  "properties": {
+    "claim_count": { "type": "integer", "minimum": 0 },
+    "verdict_counts": {
+      "type": "object",
+      "additionalProperties": { "type": "integer", "minimum": 0 }
+    },
+    "repository_claim_surface_status": {
+      "type": "string",
+      "enum": [
+        "high_claim_surface",
+        "medium_claim_surface",
+        "low_claim_surface",
+        "no_auditable_claims_found",
+        "requires_external_environment"
+      ]
+    }
+  }
+}
+

@@ -1,0 +1,4 @@
+runtime:
+  trace_capture: true
+  output_dir: traces/
+

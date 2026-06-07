@@ -1,0 +1,12 @@
+codex:
+  status: untested
+  notes: "Adapter files provided, but end-to-end Codex execution has not yet been verified."
+
+claude_code:
+  status: untested
+  notes: "Adapter files provided, but end-to-end Claude Code execution has not yet been verified."
+
+local_backend:
+  status: planned
+  notes: "Local model backend is planned for a later stage."
+
