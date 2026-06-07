@@ -13,7 +13,9 @@
     "review_action",
     "extraction_quality",
     "source_file",
+    "source_role",
     "source_location",
+    "is_auditable_claim",
     "required_evidence",
     "found_evidence",
     "missing_evidence",
@@ -86,13 +88,24 @@
         "policy_statement",
         "metric_data_point",
         "heading_or_label",
+        "heading_label",
+        "table_header",
         "incomplete_fragment",
         "code_or_error_fragment",
+        "code_or_config_fragment",
+        "taxonomy_definition",
+        "verdict_rule_definition",
+        "schema_definition",
+        "workflow_instruction",
+        "runtime_instruction",
+        "adapter_instruction",
         "other_low_quality"
       ]
     },
     "source_file": { "type": "string", "minLength": 1 },
+    "source_role": { "type": "string", "minLength": 1 },
     "source_location": { "type": "string", "minLength": 1 },
+    "is_auditable_claim": { "type": "boolean" },
     "required_evidence": {
       "type": "array",
       "items": { "type": "string", "minLength": 1 }
@@ -105,6 +118,7 @@
         "required": ["path", "summary", "strength", "evidence_type"],
         "properties": {
           "path": { "type": "string", "minLength": 1 },
+          "source_role": { "type": "string", "minLength": 1 },
           "location": { "type": "string" },
           "summary": { "type": "string", "minLength": 1 },
           "strength": {

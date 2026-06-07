@@ -91,13 +91,29 @@ BOUNDED_DOMAIN_EVIDENCE: dict[str, list[str]] = {
     ],
 }
 
+SUPPRESSED_EXTRACTION_QUALITIES = {
+    "taxonomy_definition",
+    "verdict_rule_definition",
+    "schema_definition",
+    "workflow_instruction",
+    "runtime_instruction",
+    "adapter_instruction",
+    "heading_label",
+    "table_header",
+    "incomplete_fragment",
+    "code_or_config_fragment",
+}
+
 LOW_QUALITY_EXTRACTIONS = {
     "heading_or_label",
+    "heading_label",
+    "table_header",
     "incomplete_fragment",
     "code_or_error_fragment",
+    "code_or_config_fragment",
     "metric_data_point",
     "other_low_quality",
-}
+} | SUPPRESSED_EXTRACTION_QUALITIES
 
 
 def classify_claims(claims: list[CandidateClaim]) -> list[ClassifiedClaim]:
@@ -110,8 +126,20 @@ def classify_claim(claim: CandidateClaim) -> ClassifiedClaim:
     requires_external = _requires_external_environment(text)
     extraction_quality = _extraction_quality(claim, claim_type)
     claim_domain = _claim_domain(text, claim_type, extraction_quality, claim.source_file)
-    surface = _claim_surface_status(text, claim_type, requires_external, extraction_quality)
-    claim_importance = _claim_importance(claim_type, claim_domain, extraction_quality, surface)
+    surface = _claim_surface_status(
+        text,
+        claim_type,
+        requires_external,
+        extraction_quality,
+        claim.source_role,
+    )
+    claim_importance = _claim_importance(
+        claim_type,
+        claim_domain,
+        extraction_quality,
+        surface,
+        claim.source_role,
+    )
     return ClassifiedClaim(
         claim=claim,
         claim_type=claim_type,
@@ -119,7 +147,12 @@ def classify_claim(claim: CandidateClaim) -> ClassifiedClaim:
         claim_importance=claim_importance,
         extraction_quality=extraction_quality,
         claim_surface_status=surface,
-        required_evidence=_required_evidence(claim_type, claim_domain, extraction_quality),
+        required_evidence=_required_evidence(
+            claim_type,
+            claim_domain,
+            extraction_quality,
+            claim.source_role,
+        ),
         requires_external_environment=requires_external,
     )
 
@@ -198,7 +231,10 @@ def _claim_importance(
     claim_domain: str,
     extraction_quality: str,
     claim_surface_status: str,
+    source_role: str,
 ) -> str:
+    if source_role != "claim_source":
+        return "low"
     if extraction_quality in LOW_QUALITY_EXTRACTIONS:
         return "low"
     if claim_surface_status == "requires_external_environment":
@@ -225,14 +261,19 @@ def _extraction_quality(claim: CandidateClaim, claim_type: str) -> str:
     lowered = text.lower()
     source = claim.source_file.lower()
 
+    source_quality = _source_role_extraction_quality(claim.source_role, source)
+    if source_quality:
+        return source_quality
+    if _is_table_header(text):
+        return "table_header"
     if _is_code_or_error_fragment(text, source):
-        return "code_or_error_fragment"
+        return "code_or_config_fragment"
     if _is_metric_data_point(text, source):
         return "metric_data_point"
     if _is_incomplete_fragment(text):
         return "incomplete_fragment"
     if _is_heading_or_label(text):
-        return "heading_or_label"
+        return "heading_label"
     if _is_documentation_policy_statement(lowered, source):
         return "policy_statement"
     if claim_type == "bounded_non_claim":
@@ -242,11 +283,33 @@ def _extraction_quality(claim: CandidateClaim, claim_type: str) -> str:
     return "auditable_claim"
 
 
+def _source_role_extraction_quality(source_role: str, source_file: str) -> str | None:
+    source_role = source_role.lower()
+    source_file = source_file.lower()
+    if source_role == "schema_reference":
+        return "schema_definition"
+    if source_role == "workflow_contract":
+        return "workflow_instruction"
+    if source_role == "runtime_contract":
+        return "runtime_instruction"
+    if source_role == "adapter_contract":
+        return "adapter_instruction"
+    if source_role == "reference_only":
+        if "verdict" in source_file:
+            return "verdict_rule_definition"
+        if "taxonomy" in source_file:
+            return "taxonomy_definition"
+    return None
+
+
 def _required_evidence(
     claim_type: str,
     claim_domain: str,
     extraction_quality: str,
+    source_role: str,
 ) -> list[str]:
+    if source_role != "claim_source":
+        return []
     if extraction_quality in LOW_QUALITY_EXTRACTIONS:
         return []
     if claim_type == "bounded_non_claim" and claim_domain in BOUNDED_DOMAIN_EVIDENCE:
@@ -268,7 +331,10 @@ def _claim_surface_status(
     claim_type: str,
     requires_external: bool,
     extraction_quality: str,
+    source_role: str,
 ) -> str:
+    if source_role != "claim_source":
+        return "low_claim_surface"
     if extraction_quality in LOW_QUALITY_EXTRACTIONS:
         return "low_claim_surface"
     if requires_external:
@@ -364,3 +430,11 @@ def _is_heading_or_label(text: str) -> bool:
     if len(words) <= 7 and not re.search(r"\b(achieved|achieves|is|are|was|were|does|can|supports?|provides?)\b", text.lower()):
         return True
     return bool(re.fullmatch(r"[A-Z0-9_ ./()&:-]+", text) and len(words) <= 10)
+
+
+def _is_table_header(text: str) -> bool:
+    stripped = text.strip()
+    if "|" not in stripped:
+        return False
+    cells = [cell.strip() for cell in stripped.strip("|").split("|")]
+    return len(cells) >= 2 and all(cell and len(cell.split()) <= 4 for cell in cells)

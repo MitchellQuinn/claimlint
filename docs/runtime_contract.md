@@ -25,7 +25,7 @@ The required five output files must exist even if no auditable claims are found.
 
 ## Runtime behaviour
 
-The CLI loads and validates the input manifest, reads manifest-selected files, chunks supported files, extracts candidate claims, classifies them, defines required evidence, retrieves evidence, judges support, records missing evidence and artifact gaps, renders outputs, and saves run metadata.
+The CLI loads and validates the input manifest, reads manifest-selected files, chunks supported files, extracts candidate claims only from entries where `extract_claims` is true, classifies them, defines required evidence, retrieves evidence only from chunks where `use_as_evidence` is true, judges support, records missing evidence and artifact gaps, renders outputs, and saves run metadata.
 
 ## Exit codes
 
@@ -36,4 +36,3 @@ The CLI loads and validates the input manifest, reads manifest-selected files, c
 - `4`: runtime error
 
 A successful audit with zero claims exits `0`.
-

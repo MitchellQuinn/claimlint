@@ -5,6 +5,24 @@ import re
 from .types import ClassifiedClaim
 
 
+NON_AUDITABLE_EXTRACTION_QUALITIES = {
+    "taxonomy_definition",
+    "verdict_rule_definition",
+    "schema_definition",
+    "workflow_instruction",
+    "runtime_instruction",
+    "adapter_instruction",
+    "heading_or_label",
+    "heading_label",
+    "table_header",
+    "incomplete_fragment",
+    "code_or_error_fragment",
+    "code_or_config_fragment",
+    "metric_data_point",
+    "other_low_quality",
+}
+
+
 def build_claim_record(classified: ClassifiedClaim, found_evidence: list[dict]) -> dict:
     missing_evidence = _missing_evidence(classified, found_evidence)
     artifact_gaps = _artifact_gaps(classified, missing_evidence, found_evidence)
@@ -26,7 +44,9 @@ def build_claim_record(classified: ClassifiedClaim, found_evidence: list[dict]) 
         "extraction_quality": classified.extraction_quality,
         "claim_surface_status": classified.claim_surface_status,
         "source_file": claim.source_file,
+        "source_role": claim.source_role,
         "source_location": claim.source_location,
+        "is_auditable_claim": _is_auditable_claim(classified),
         "verification_mode": verification_mode,
         "requires_external_environment": classified.requires_external_environment,
         "required_evidence": classified.required_evidence,
@@ -189,13 +209,7 @@ def _verification_mode(
     found_evidence: list[dict],
     missing_evidence: list[dict],
 ) -> str:
-    if classified.extraction_quality in {
-        "heading_or_label",
-        "incomplete_fragment",
-        "code_or_error_fragment",
-        "metric_data_point",
-        "other_low_quality",
-    }:
+    if not _is_auditable_claim(classified):
         return "not_verifiable_from_available_material"
     if classified.requires_external_environment:
         return "external_environment_required"
@@ -232,13 +246,7 @@ def _verdict(
     missing_evidence: list[dict],
 ) -> str:
     text = classified.claim.claim_text.lower()
-    if classified.extraction_quality in {
-        "heading_or_label",
-        "incomplete_fragment",
-        "code_or_error_fragment",
-        "metric_data_point",
-        "other_low_quality",
-    }:
+    if not _is_auditable_claim(classified):
         return "ambiguous"
     if _is_ambiguous(text):
         return "ambiguous"
@@ -283,14 +291,8 @@ def _recommended_remediation(
     artifact_gaps: list[dict],
     verdict: str,
 ) -> list[str]:
-    if classified.extraction_quality in {
-        "heading_or_label",
-        "incomplete_fragment",
-        "code_or_error_fragment",
-        "metric_data_point",
-        "other_low_quality",
-    }:
-        return ["Ignore this low-quality extraction or rewrite the nearby source text as a complete auditable claim."]
+    if not _is_auditable_claim(classified):
+        return ["Do not treat this reference or low-quality record as an auditable project claim."]
 
     remediation: list[str] = []
     for item in missing_evidence:
@@ -316,13 +318,9 @@ def _risk(
     missing_evidence: list[dict],
     artifact_gaps: list[dict],
 ) -> str:
-    if classified.extraction_quality in {
-        "heading_or_label",
-        "incomplete_fragment",
-        "code_or_error_fragment",
-        "metric_data_point",
-        "other_low_quality",
-    }:
+    if not _is_auditable_claim(classified):
+        if classified.claim.source_role.lower() != "claim_source":
+            return "This record comes from reference or contract material and is not an auditable project claim."
         return "This extraction is too fragmentary or artifact-like for priority review and is demoted to the full listing."
     if verdict == "supported":
         return "The selected corpus contains strong matching evidence and no major missing evidence was identified."
@@ -429,13 +427,7 @@ def _dedupe_gaps(gaps: list[dict]) -> list[dict]:
 
 
 def _review_action(classified: ClassifiedClaim, verdict: str) -> str:
-    if classified.extraction_quality in {
-        "heading_or_label",
-        "incomplete_fragment",
-        "code_or_error_fragment",
-        "metric_data_point",
-        "other_low_quality",
-    }:
+    if not _is_auditable_claim(classified):
         return "ignore_low_quality_extraction"
     if verdict == "needs_human_review":
         return "human_review_required"
@@ -450,3 +442,10 @@ def _review_action(classified: ClassifiedClaim, verdict: str) -> str:
     if classified.claim_importance == "high":
         return "keep_evidence_linked"
     return "no_action"
+
+
+def _is_auditable_claim(classified: ClassifiedClaim) -> bool:
+    return (
+        classified.claim.source_role.lower() == "claim_source"
+        and classified.extraction_quality not in NON_AUDITABLE_EXTRACTION_QUALITIES
+    )

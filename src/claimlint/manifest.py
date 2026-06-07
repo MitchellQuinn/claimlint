@@ -20,6 +20,26 @@ SUPPORTED_EXTENSIONS = {
     ".csv",
     ".toml",
 }
+SOURCE_ROLES = {
+    "claim_source",
+    "reference_only",
+    "schema_reference",
+    "workflow_contract",
+    "runtime_contract",
+    "adapter_contract",
+    "example_output",
+    "source_code",
+    "test_fixture",
+}
+LEGACY_ROLE_SOURCE_ROLE_MAP = {
+    "schema": "schema_reference",
+    "schemas": "schema_reference",
+    "workflow": "workflow_contract",
+    "workflow_contract": "workflow_contract",
+    "runtime_contract": "runtime_contract",
+    "adapter_documentation": "adapter_contract",
+    "adapter_status": "adapter_contract",
+}
 
 
 class ManifestError(ValueError):
@@ -60,6 +80,15 @@ def load_manifest(repo_path: str | Path, manifest_path: str | Path) -> ManifestS
             continue
 
         role = str(entry.get("role") or "unspecified")
+        source_role = str(
+            entry.get("source_role") or _source_role_from_legacy_role(role)
+        ).strip().lower()
+        extract_claims = _bool_setting(
+            entry,
+            "extract_claims",
+            default=source_role == "claim_source",
+        )
+        use_as_evidence = _bool_setting(entry, "use_as_evidence", default=True)
         candidates: list[Path] = []
 
         if "path" in entry:
@@ -104,6 +133,9 @@ def load_manifest(repo_path: str | Path, manifest_path: str | Path) -> ManifestS
                     role=role,
                     size_bytes=size_bytes,
                     sha256=_sha256_file(candidate),
+                    source_role=source_role,
+                    extract_claims=extract_claims,
+                    use_as_evidence=use_as_evidence,
                 ),
             )
 
@@ -137,6 +169,28 @@ def _exclude_patterns(exclude: object) -> list[str]:
     return patterns
 
 
+def _source_role_from_legacy_role(role: str) -> str:
+    normalized = role.strip().lower()
+    if normalized in SOURCE_ROLES:
+        return normalized
+    return LEGACY_ROLE_SOURCE_ROLE_MAP.get(normalized, "claim_source")
+
+
+def _bool_setting(entry: dict[str, Any], key: str, *, default: bool) -> bool:
+    if key not in entry:
+        return default
+    value = entry[key]
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        normalized = value.strip().lower()
+        if normalized in {"true", "yes", "1", "on"}:
+            return True
+        if normalized in {"false", "no", "0", "off"}:
+            return False
+    raise ManifestError(f"Manifest field '{key}' must be a boolean.")
+
+
 def _matches_any(rel_path: str, patterns: list[str]) -> bool:
     rel_path = rel_path.replace("\\", "/")
     for pattern in patterns:
@@ -166,4 +220,3 @@ def _sha256_file(path: Path) -> str:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
-

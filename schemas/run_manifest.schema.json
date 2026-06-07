@@ -43,12 +43,23 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["path", "role", "size_bytes", "sha256"],
+        "required": [
+          "path",
+          "role",
+          "size_bytes",
+          "sha256",
+          "source_role",
+          "extract_claims",
+          "use_as_evidence"
+        ],
         "properties": {
           "path": { "type": "string" },
           "role": { "type": "string" },
           "size_bytes": { "type": "integer", "minimum": 0 },
-          "sha256": { "type": "string" }
+          "sha256": { "type": "string" },
+          "source_role": { "type": "string" },
+          "extract_claims": { "type": "boolean" },
+          "use_as_evidence": { "type": "boolean" }
         }
       }
     },
@@ -88,4 +99,3 @@
     }
   }
 }
-

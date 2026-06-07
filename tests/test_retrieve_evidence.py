@@ -1,3 +1,4 @@
+from dataclasses import replace
 from pathlib import Path
 
 from claimlint.classify_claims import classify_claims
@@ -37,3 +38,15 @@ def test_evidence_path_always_exists():
         for evidence in retrieve_evidence(item, chunks):
             assert (FIXTURE / evidence["path"]).exists()
 
+
+def test_chunks_disabled_as_evidence_are_not_retrieved():
+    classified, chunks = _classified_and_chunks()
+    metric_claim = next(item for item in classified if item.claim_type == "metric_claim")
+    gated_chunks = [
+        replace(chunk, use_as_evidence=False)
+        if chunk.path == "metrics/validation_metrics.json"
+        else chunk
+        for chunk in chunks
+    ]
+    evidence = retrieve_evidence(metric_claim, gated_chunks)
+    assert not any(item["path"] == "metrics/validation_metrics.json" for item in evidence)

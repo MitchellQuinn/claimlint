@@ -13,6 +13,9 @@ def test_manifest_loads_fixture_files():
     assert "README.md" in paths
     assert "docs/technical_notes.md" in paths
     assert "metrics/validation_metrics.json" in paths
+    assert all(input_file.source_role == "claim_source" for input_file in selection.input_files)
+    assert all(input_file.extract_claims for input_file in selection.input_files)
+    assert all(input_file.use_as_evidence for input_file in selection.input_files)
 
 
 def test_excludes_are_respected(tmp_path):
@@ -34,5 +37,5 @@ def test_markdown_chunking_preserves_path_and_line_numbers():
     readme_chunks = [chunk for chunk in chunks if chunk.path == "README.md"]
     assert readme_chunks
     assert all(chunk.start_line >= 1 for chunk in readme_chunks)
+    assert all(chunk.source_role == "claim_source" for chunk in readme_chunks)
     assert any("Results" in chunk.heading_path for chunk in readme_chunks)
-

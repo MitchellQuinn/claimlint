@@ -12,7 +12,7 @@ inputs:
   input_manifest:
     type: yaml
     required: true
-    description: Manifest listing files/globs to include in the audit corpus.
+    description: Manifest listing files/globs to include in the audit corpus, including source_role, extract_claims, and use_as_evidence controls.
 
 outputs:
   claims_jsonl:
@@ -37,7 +37,7 @@ stages:
     description: Load manifest-selected files and split them into traceable chunks.
 
   - id: extract_claims
-    description: Extract candidate claim statements from ingested chunks.
+    description: Extract candidate claim statements only from ingested chunks where extract_claims is true.
 
   - id: classify_claim_types
     description: Classify each candidate claim using the claim taxonomy.
@@ -46,7 +46,7 @@ stages:
     description: Define what evidence would be required to support each claim.
 
   - id: retrieve_evidence
-    description: Search ingested chunks for candidate supporting or contradictory evidence.
+    description: Search ingested chunks where use_as_evidence is true for candidate supporting or contradictory evidence.
 
   - id: judge_support
     description: Assign support verdicts based on claim text, required evidence, found evidence, missing evidence, and artifact gaps.
@@ -71,4 +71,3 @@ non_goals:
   - fully autonomous self-improvement
   - local model fine-tuning
   - general AI auditor claim
-

@@ -93,5 +93,7 @@ def _make_chunk(
         end_line=end_line,
         text=text,
         sha256=text_hash,
+        source_role=input_file.source_role,
+        extract_claims=input_file.extract_claims,
+        use_as_evidence=input_file.use_as_evidence,
     )
-

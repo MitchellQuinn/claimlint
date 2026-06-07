@@ -3,6 +3,7 @@ from pathlib import Path
 from claimlint.classify_claims import classify_claim, classify_claims
 from claimlint.extract_claims import extract_claims
 from claimlint.ingest_markdown import ingest_files
+from claimlint.judge_support import build_claim_record
 from claimlint.manifest import load_manifest
 from claimlint.types import CandidateClaim, DocumentChunk
 
@@ -61,6 +62,42 @@ def test_heading_and_table_header_noise_is_suppressed():
         sha256="abc",
     )
     assert extract_claims([chunk]) == []
+
+
+def test_reference_chunks_are_not_extracted_when_disabled():
+    chunk = DocumentChunk(
+        chunk_id="chunk_reference",
+        path="docs/claim_taxonomy.md",
+        role="taxonomy",
+        heading_path=["Claim domains"],
+        start_line=1,
+        end_line=1,
+        text="`licensing_rights`: license, copyright, permissions, and rights statements.",
+        sha256="abc",
+        source_role="reference_only",
+        extract_claims=False,
+        use_as_evidence=True,
+    )
+    assert extract_claims([chunk]) == []
+
+
+def test_forced_reference_extraction_is_not_auditable():
+    claim = CandidateClaim(
+        claim_id="claim_reference",
+        claim_text="`licensing_rights`: license, copyright, permissions, and rights statements.",
+        source_file="docs/claim_taxonomy.md",
+        source_location="section: Claim domains; line 1",
+        source_chunk_id="chunk_reference",
+        start_line=1,
+        end_line=1,
+        source_role="reference_only",
+    )
+    classified = classify_claim(claim)
+    record = build_claim_record(classified, [])
+    assert classified.extraction_quality == "taxonomy_definition"
+    assert record["source_role"] == "reference_only"
+    assert record["is_auditable_claim"] is False
+    assert record["review_action"] == "ignore_low_quality_extraction"
 
 
 def test_bounded_non_claim_domains_are_not_collapsed():

@@ -27,11 +27,23 @@ def test_cli_audit_writes_required_outputs(tmp_path):
         for line in handle:
             record = json.loads(line)
             validate_claim_record(record)
-            assert {"claim_domain", "claim_importance", "review_action", "extraction_quality"} <= set(record)
+            assert {
+                "claim_domain",
+                "claim_importance",
+                "review_action",
+                "extraction_quality",
+                "source_role",
+                "is_auditable_claim",
+            } <= set(record)
     manifest = json.loads((out / "run_manifest.json").read_text(encoding="utf-8"))
     assert manifest["tool_name"] == "claimlint"
     assert manifest["workflow_id"] == "claimlint.claim-audit"
     assert "verdict_counts" in manifest
+    assert {
+        "source_role",
+        "extract_claims",
+        "use_as_evidence",
+    } <= set(manifest["input_files"][0])
     assert manifest["repo_path"] == "."
     assert manifest["manifest_path"] == "input_manifest.yml"
     _assert_posix_relative_paths(manifest)

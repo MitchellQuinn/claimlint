@@ -9,6 +9,9 @@ class InputFile:
     role: str
     size_bytes: int
     sha256: str
+    source_role: str = "claim_source"
+    extract_claims: bool = True
+    use_as_evidence: bool = True
 
 
 @dataclass(frozen=True)
@@ -21,6 +24,9 @@ class DocumentChunk:
     end_line: int
     text: str
     sha256: str
+    source_role: str = "claim_source"
+    extract_claims: bool = True
+    use_as_evidence: bool = True
 
 
 @dataclass(frozen=True)
@@ -32,6 +38,7 @@ class CandidateClaim:
     source_chunk_id: str
     start_line: int | None
     end_line: int | None
+    source_role: str = "claim_source"
 
 
 @dataclass(frozen=True)

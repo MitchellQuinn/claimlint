@@ -66,9 +66,14 @@ def build_run_manifest(
 
 
 def repository_claim_surface_status(claim_records: list[dict]) -> str:
-    if not claim_records:
+    auditable_records = [
+        record
+        for record in claim_records
+        if record.get("is_auditable_claim", record.get("source_role", "claim_source") == "claim_source")
+    ]
+    if not auditable_records:
         return "no_auditable_claims_found"
-    statuses = [record["claim_surface_status"] for record in claim_records]
+    statuses = [record["claim_surface_status"] for record in auditable_records]
     if "requires_external_environment" in statuses:
         return "requires_external_environment"
     if "high_claim_surface" in statuses:

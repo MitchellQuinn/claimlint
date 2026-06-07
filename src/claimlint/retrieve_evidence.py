@@ -49,6 +49,8 @@ def retrieve_evidence(
     scored: list[tuple[float, DocumentChunk, list[str]]] = []
 
     for chunk in chunks:
+        if not chunk.use_as_evidence:
+            continue
         if chunk.chunk_id == claim.source_chunk_id:
             continue
         chunk_tokens = tokenize(chunk.text + " " + " ".join(chunk.heading_path))
@@ -125,6 +127,7 @@ def _evidence_object(score: float, chunk: DocumentChunk, matched_terms: list[str
     location = _location(chunk)
     return {
         "path": chunk.path,
+        "source_role": chunk.source_role,
         "location": location,
         "summary": f"Candidate evidence from {chunk.path}, lines {chunk.start_line}-{chunk.end_line}, matched terms: {matched}.",
         "strength": _strength(score, chunk.text),
@@ -183,4 +186,3 @@ def _snippet(text: str, max_chars: int = 320) -> str:
     if len(compact) <= max_chars:
         return compact
     return compact[: max_chars - 3].rstrip() + "..."
-

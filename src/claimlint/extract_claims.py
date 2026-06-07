@@ -35,20 +35,40 @@ TABLE_SEPARATOR_RE = re.compile(r"^\s*\|?\s*:?-{3,}:?\s*(?:\|\s*:?-{3,}:?\s*)+\|
 
 
 def extract_claims(chunks: list[DocumentChunk]) -> list[CandidateClaim]:
-    candidates: list[tuple[str, str, str, str, int, int]] = []
+    candidates: list[tuple[str, str, str, str, int, int, str]] = []
     seen: set[str] = set()
 
     for chunk in chunks:
+        if not chunk.extract_claims:
+            continue
         for text, start_line, end_line in _candidate_texts(chunk):
             normalized = _normalize_claim(text)
             if normalized in seen or not _looks_like_claim(text):
                 continue
             seen.add(normalized)
             location = _source_location(chunk, start_line, end_line)
-            candidates.append((text, chunk.path, location, chunk.chunk_id, start_line, end_line))
+            candidates.append(
+                (
+                    text,
+                    chunk.path,
+                    location,
+                    chunk.chunk_id,
+                    start_line,
+                    end_line,
+                    chunk.source_role,
+                )
+            )
 
     claims: list[CandidateClaim] = []
-    for index, (text, path, location, chunk_id, start_line, end_line) in enumerate(candidates, start=1):
+    for index, (
+        text,
+        path,
+        location,
+        chunk_id,
+        start_line,
+        end_line,
+        source_role,
+    ) in enumerate(candidates, start=1):
         stable = hashlib.sha256(f"{path}:{start_line}:{text}".encode("utf-8")).hexdigest()[:8]
         claims.append(
             CandidateClaim(
@@ -59,6 +79,7 @@ def extract_claims(chunks: list[DocumentChunk]) -> list[CandidateClaim]:
                 source_chunk_id=chunk_id,
                 start_line=start_line,
                 end_line=end_line,
+                source_role=source_role,
             )
         )
     return claims
