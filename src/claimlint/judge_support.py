@@ -8,6 +8,9 @@ from .types import ClassifiedClaim
 NON_AUDITABLE_EXTRACTION_QUALITIES = {
     "bounded_context",
     "policy_statement",
+    "frontmatter_metadata",
+    "roadmap_statement",
+    "boundary_statement",
     "taxonomy_definition",
     "verdict_rule_definition",
     "schema_definition",
@@ -293,6 +296,12 @@ def _recommended_remediation(
     artifact_gaps: list[dict],
     verdict: str,
 ) -> list[str]:
+    if classified.extraction_quality == "boundary_statement":
+        return ["Keep this as a boundary or non-goal note; do not audit it as an implementation claim."]
+    if classified.extraction_quality == "roadmap_statement":
+        return ["Keep this as roadmap context unless the wording claims the feature already exists."]
+    if classified.extraction_quality == "frontmatter_metadata":
+        return ["Keep this as source metadata; do not audit it as a project claim."]
     if not _is_auditable_claim(classified):
         return ["Do not treat this reference or low-quality record as an auditable project claim."]
 
@@ -321,6 +330,12 @@ def _risk(
     artifact_gaps: list[dict],
 ) -> str:
     if not _is_auditable_claim(classified):
+        if classified.extraction_quality == "boundary_statement":
+            return "This is a boundary, safety, or non-goal statement and is retained as context rather than audited as an implementation claim."
+        if classified.extraction_quality == "roadmap_statement":
+            return "This is a future or roadmap statement and is not evidence that the feature already exists."
+        if classified.extraction_quality == "frontmatter_metadata":
+            return "This is frontmatter metadata and is not an auditable project claim."
         if classified.claim.source_role.lower() != "claim_source":
             return "This record comes from reference or contract material and is not an auditable project claim."
         return "This extraction is too fragmentary or artifact-like for priority review and is demoted to the full listing."
@@ -429,6 +444,8 @@ def _dedupe_gaps(gaps: list[dict]) -> list[dict]:
 
 
 def _review_action(classified: ClassifiedClaim, verdict: str) -> str:
+    if classified.extraction_quality == "boundary_statement":
+        return "keep_as_boundary_note"
     if not _is_auditable_claim(classified):
         return "ignore_low_quality_extraction"
     if verdict == "needs_human_review":

@@ -61,3 +61,22 @@ def test_invalid_verification_mode_fails():
     record["verification_mode"] = "quick_metric_check"
     with pytest.raises(SchemaValidationError):
         validate_claim_record(record)
+
+
+def test_boundary_statement_record_passes():
+    record = valid_claim_record()
+    record["claim_id"] = "claim_boundary"
+    record["claim_text"] = "Do not silently modify the target repository."
+    record["claim_type"] = "bounded_non_claim"
+    record["claim_domain"] = "other"
+    record["claim_importance"] = "low"
+    record["review_action"] = "keep_as_boundary_note"
+    record["extraction_quality"] = "boundary_statement"
+    record["claim_surface_status"] = "low_claim_surface"
+    record["is_auditable_claim"] = False
+    record["verification_mode"] = "not_verifiable_from_available_material"
+    record["required_evidence"] = []
+    record["found_evidence"] = []
+    record["verdict"] = "ambiguous"
+    record["confidence"] = "low"
+    validate_claim_record(record)

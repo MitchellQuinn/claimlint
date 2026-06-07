@@ -39,8 +39,6 @@ VERDICT_ORDER = [
     "supported",
 ]
 LOW_QUALITY_EXTRACTIONS = {
-    "bounded_context",
-    "policy_statement",
     "heading_or_label",
     "heading_label",
     "table_header",
@@ -49,16 +47,26 @@ LOW_QUALITY_EXTRACTIONS = {
     "code_or_config_fragment",
     "metric_data_point",
     "other_low_quality",
+}
+SUPPRESSED_EXTRACTIONS = {
+    "bounded_context",
+    "policy_statement",
     "taxonomy_definition",
     "verdict_rule_definition",
     "schema_definition",
     "workflow_instruction",
     "runtime_instruction",
     "adapter_instruction",
+    "frontmatter_metadata",
+    "roadmap_statement",
+    "boundary_statement",
 }
 PRIORITY_EXCLUDED_EXTRACTIONS = {
     "bounded_context",
     "policy_statement",
+    "frontmatter_metadata",
+    "roadmap_statement",
+    "boundary_statement",
     "taxonomy_definition",
     "verdict_rule_definition",
     "schema_definition",
@@ -82,6 +90,7 @@ NON_ACTIONS = {
     "no_action",
     "keep_evidence_linked",
     "ignore_low_quality_extraction",
+    "keep_as_boundary_note",
 }
 
 
@@ -120,6 +129,7 @@ def _claims_report(claim_records: list[dict], run_manifest: dict) -> str:
     lines.extend(_priority_findings(claim_records))
     lines.extend(_high_importance_actions(claim_records))
     lines.extend(_claims_grouped_by_domain(claim_records))
+    lines.extend(_boundary_statement_records(claim_records))
     lines.extend(_suppressed_reference_records(claim_records))
     lines.extend(_full_claim_listing(claim_records))
     return "\n".join(lines) + "\n"
@@ -129,7 +139,8 @@ def _executive_summary(claim_records: list[dict], run_manifest: dict) -> list[st
     auditable_records = [record for record in claim_records if _is_visible_audit_record(record)]
     action_count = sum(1 for record in claim_records if _requires_action(record))
     high_count = sum(1 for record in auditable_records if record["claim_importance"] == "high")
-    demoted_count = sum(1 for record in claim_records if _is_suppressed_record(record))
+    demoted_count = sum(1 for record in claim_records if _is_suppressed_reference_record(record))
+    boundary_count = sum(1 for record in claim_records if _is_boundary_record(record))
     lines = [
         "## Executive Summary",
         "",
@@ -142,6 +153,7 @@ def _executive_summary(claim_records: list[dict], run_manifest: dict) -> list[st
         f"- Repository claim surface status: {run_manifest['repository_claim_surface_status']}",
         f"- High-importance claims: {high_count}",
         f"- Claims requiring action: {action_count}",
+        f"- Boundary/non-goal statements: {boundary_count}",
         f"- Suppressed reference or low-quality records: {demoted_count}",
         "",
     ]
@@ -203,7 +215,7 @@ def _domain_summary(claim_records: list[dict]) -> list[str]:
             if _is_visible_audit_record(record) and record["claim_importance"] == "high"
         )
         action_count = sum(1 for record in records if _requires_action(record))
-        demoted_count = sum(1 for record in records if _is_suppressed_record(record))
+        demoted_count = sum(1 for record in records if _is_suppressed_reference_record(record))
         lines.append(
             f"| {label} | {len(records)} | {auditable_count} | {high_count} | {action_count} | {demoted_count} |"
         )
@@ -279,7 +291,8 @@ def _claims_grouped_by_domain(claim_records: list[dict]) -> list[str]:
             for record in records
             if _is_visible_audit_record(record)
         ]
-        demoted_count = len(records) - len(visible_records)
+        demoted_count = sum(1 for record in records if _is_suppressed_reference_record(record))
+        boundary_count = sum(1 for record in records if _is_boundary_record(record))
         lines.extend([f"### {label}", ""])
         if not visible_records:
             lines.append("No audit-ready claims in this domain.")
@@ -290,12 +303,16 @@ def _claims_grouped_by_domain(claim_records: list[dict]) -> list[str]:
             lines.append(
                 f"- {demoted_count} suppressed reference or low-quality record(s) in this domain are listed separately or in the Full Claim Listing."
             )
+        if boundary_count:
+            lines.append(
+                f"- {boundary_count} boundary or non-goal statement(s) in this domain are listed separately."
+            )
         lines.append("")
     return lines
 
 
 def _suppressed_reference_records(claim_records: list[dict]) -> list[str]:
-    records = [record for record in claim_records if _is_suppressed_record(record)]
+    records = [record for record in claim_records if _is_suppressed_reference_record(record)]
     lines = ["## Suppressed Reference Records", ""]
     if not records:
         lines.extend(["No suppressed reference or low-quality records.", ""])
@@ -304,6 +321,21 @@ def _suppressed_reference_records(claim_records: list[dict]) -> list[str]:
         lines.append(
             f"- {record['claim_id']} | {record['source_role']} | {record['extraction_quality']} | "
             f"{_truncate(record['claim_text'], 140)}"
+        )
+    lines.append("")
+    return lines
+
+
+def _boundary_statement_records(claim_records: list[dict]) -> list[str]:
+    records = [record for record in claim_records if _is_boundary_record(record)]
+    lines = ["## Boundary / Non-Goal Statements", ""]
+    if not records:
+        lines.extend(["No boundary or non-goal statements.", ""])
+        return lines
+    for record in sorted(records, key=_priority_sort_key):
+        lines.append(
+            f"- {record['claim_id']} | {record['source_file']} | "
+            f"{_truncate(record['claim_text'], 160)}"
         )
     lines.append("")
     return lines
@@ -462,8 +494,17 @@ def _is_suppressed_record(record: dict) -> bool:
     return (
         not _is_auditable_record(record)
         or record["extraction_quality"] in PRIORITY_EXCLUDED_EXTRACTIONS
+        or record["extraction_quality"] in SUPPRESSED_EXTRACTIONS
         or _is_low_quality(record)
     )
+
+
+def _is_boundary_record(record: dict) -> bool:
+    return record["extraction_quality"] == "boundary_statement"
+
+
+def _is_suppressed_reference_record(record: dict) -> bool:
+    return _is_suppressed_record(record) and not _is_boundary_record(record)
 
 
 def _is_priority_finding(record: dict) -> bool:
@@ -493,7 +534,8 @@ def _priority_sort_key(record: dict) -> tuple[int, int, int, int, str]:
         "clarify_claim_wording": 4,
         "keep_evidence_linked": 5,
         "no_action": 6,
-        "ignore_low_quality_extraction": 7,
+        "keep_as_boundary_note": 7,
+        "ignore_low_quality_extraction": 8,
     }
     importance_rank = {"high": 0, "medium": 1, "low": 2}
     verdict_rank = {verdict: index for index, verdict in enumerate(VERDICT_ORDER)}

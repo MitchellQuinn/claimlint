@@ -100,6 +100,71 @@ def test_forced_reference_extraction_is_not_auditable():
     assert record["review_action"] == "ignore_low_quality_extraction"
 
 
+def test_skill_frontmatter_is_metadata_not_auditable():
+    claim = CandidateClaim(
+        claim_id="claim_frontmatter",
+        claim_text="--- name: claimlint description: Supports repository claim auditing. ---",
+        source_file="skills/claimlint/SKILL.md",
+        source_location="section: unheaded; lines 1-4",
+        source_chunk_id="chunk_frontmatter",
+        start_line=1,
+        end_line=4,
+    )
+    classified = classify_claim(claim)
+    record = build_claim_record(classified, [])
+    assert classified.extraction_quality == "frontmatter_metadata"
+    assert record["is_auditable_claim"] is False
+
+
+def test_future_work_is_roadmap_statement_not_auditable():
+    claim = CandidateClaim(
+        claim_id="claim_roadmap",
+        claim_text="Future work may add evaluated local backends and richer retrieval.",
+        source_file="README.md",
+        source_location="section: Future Stages; line 1",
+        source_chunk_id="chunk_roadmap",
+        start_line=1,
+        end_line=1,
+    )
+    classified = classify_claim(claim)
+    record = build_claim_record(classified, [])
+    assert classified.extraction_quality == "roadmap_statement"
+    assert record["is_auditable_claim"] is False
+
+
+def test_boundary_statement_is_kept_as_boundary_note():
+    claim = CandidateClaim(
+        claim_id="claim_boundary",
+        claim_text="Do not silently modify the target repository.",
+        source_file="skills/claimlint/SKILL.md",
+        source_location="section: Non-goals; line 1",
+        source_chunk_id="chunk_boundary",
+        start_line=1,
+        end_line=1,
+    )
+    classified = classify_claim(claim)
+    record = build_claim_record(classified, [])
+    assert classified.extraction_quality == "boundary_statement"
+    assert record["is_auditable_claim"] is False
+    assert record["review_action"] == "keep_as_boundary_note"
+
+
+def test_safety_claim_word_alone_is_not_boundary_statement():
+    claim = CandidateClaim(
+        claim_id="claim_safety",
+        claim_text="The runtime supports safety checks for repository writes.",
+        source_file="README.md",
+        source_location="section: Runtime; line 1",
+        source_chunk_id="chunk_safety",
+        start_line=1,
+        end_line=1,
+    )
+    classified = classify_claim(claim)
+    record = build_claim_record(classified, [])
+    assert classified.extraction_quality == "auditable_claim"
+    assert record["is_auditable_claim"] is True
+
+
 def test_bounded_non_claim_domains_are_not_collapsed():
     examples = {
         "licensing_rights": "This repository is intentionally published without an open-source license.",

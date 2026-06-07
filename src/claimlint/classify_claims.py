@@ -94,6 +94,9 @@ BOUNDED_DOMAIN_EVIDENCE: dict[str, list[str]] = {
 SUPPRESSED_EXTRACTION_QUALITIES = {
     "bounded_context",
     "policy_statement",
+    "frontmatter_metadata",
+    "roadmap_statement",
+    "boundary_statement",
     "taxonomy_definition",
     "verdict_rule_definition",
     "schema_definition",
@@ -115,7 +118,8 @@ LOW_QUALITY_EXTRACTIONS = {
     "code_or_config_fragment",
     "metric_data_point",
     "other_low_quality",
-} | SUPPRESSED_EXTRACTION_QUALITIES
+}
+NON_AUDITABLE_EXTRACTION_QUALITIES = LOW_QUALITY_EXTRACTIONS | SUPPRESSED_EXTRACTION_QUALITIES
 
 
 def classify_claims(claims: list[CandidateClaim]) -> list[ClassifiedClaim]:
@@ -237,7 +241,7 @@ def _claim_importance(
 ) -> str:
     if source_role != "claim_source":
         return "low"
-    if extraction_quality in LOW_QUALITY_EXTRACTIONS:
+    if extraction_quality in NON_AUDITABLE_EXTRACTION_QUALITIES:
         return "low"
     if claim_surface_status == "requires_external_environment":
         return "high"
@@ -266,6 +270,12 @@ def _extraction_quality(claim: CandidateClaim, claim_type: str) -> str:
     source_quality = _source_role_extraction_quality(claim.source_role, source)
     if source_quality:
         return source_quality
+    if _is_frontmatter_metadata(claim, source):
+        return "frontmatter_metadata"
+    if _is_roadmap_statement(lowered):
+        return "roadmap_statement"
+    if _is_boundary_statement(lowered):
+        return "boundary_statement"
     if _is_table_header(text):
         return "table_header"
     if _is_code_or_error_fragment(text, source):
@@ -281,7 +291,7 @@ def _extraction_quality(claim: CandidateClaim, claim_type: str) -> str:
     if claim_type == "bounded_non_claim":
         if _is_generalisation_or_scope_statement(lowered, claim_type):
             return "caveat_or_scope_note"
-        return "bounded_context"
+        return "boundary_statement"
     return "auditable_claim"
 
 
@@ -312,7 +322,7 @@ def _required_evidence(
 ) -> list[str]:
     if source_role != "claim_source":
         return []
-    if extraction_quality in LOW_QUALITY_EXTRACTIONS:
+    if extraction_quality in NON_AUDITABLE_EXTRACTION_QUALITIES:
         return []
     if claim_type == "bounded_non_claim" and claim_domain in BOUNDED_DOMAIN_EVIDENCE:
         return list(BOUNDED_DOMAIN_EVIDENCE[claim_domain])
@@ -337,7 +347,7 @@ def _claim_surface_status(
 ) -> str:
     if source_role != "claim_source":
         return "low_claim_surface"
-    if extraction_quality in LOW_QUALITY_EXTRACTIONS:
+    if extraction_quality in NON_AUDITABLE_EXTRACTION_QUALITIES:
         return "low_claim_surface"
     if requires_external:
         return "requires_external_environment"
@@ -440,3 +450,42 @@ def _is_table_header(text: str) -> bool:
         return False
     cells = [cell.strip() for cell in stripped.strip("|").split("|")]
     return len(cells) >= 2 and all(cell and len(cell.split()) <= 4 for cell in cells)
+
+
+def _is_frontmatter_metadata(claim: CandidateClaim, source_file: str) -> bool:
+    if not source_file.endswith(".md"):
+        return False
+    if claim.start_line is None or claim.start_line > 8:
+        return False
+    text = claim.claim_text.strip().lower()
+    if text.startswith("---") and re.search(r"\b(name|description|title|version|author|tags):", text):
+        return True
+    return bool(
+        re.search(r"\b(name|description|title|version|author|tags):", text)
+        and ("skill.md" in source_file or claim.start_line <= 3)
+    )
+
+
+def _is_roadmap_statement(text: str) -> bool:
+    if re.search(r"\b(now|currently|already|implemented|available)\b", text):
+        return False
+    return bool(
+        re.search(
+            r"\b(future work|roadmap|planned|later stage|may add|might add|will add|could add|not part of v\d+(?:\.\d+)*)\b",
+            text,
+        )
+    )
+
+
+def _is_boundary_statement(text: str) -> bool:
+    return bool(
+        re.search(
+            r"\b("
+            r"do not|must not|should not|does not|not a|not an|not intended|not exhaustive|"
+            r"out of scope|non-goals?|non-goal|without an open-source license|"
+            r"silently modify|"
+            r"do not claim|do not imply|do not present"
+            r")\b",
+            text,
+        )
+    )

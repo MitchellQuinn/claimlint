@@ -61,6 +61,15 @@ def test_priority_findings_exclude_low_importance_and_suppressed_quality():
             extraction_quality="bounded_context",
             verdict="partially_supported",
         ),
+        _record(
+            claim_id="claim_boundary",
+            claim_importance="low",
+            claim_text="Do not silently modify the target repository.",
+            extraction_quality="boundary_statement",
+            review_action="keep_as_boundary_note",
+            is_auditable_claim=False,
+            verdict="ambiguous",
+        ),
     ]
 
     report = _claims_report(records, _run_manifest())
@@ -76,9 +85,16 @@ def test_priority_findings_exclude_low_importance_and_suppressed_quality():
         "## Full Claim Listing",
         1,
     )[0]
+    boundary_section = report.split("## Boundary / Non-Goal Statements", 1)[1].split(
+        "## Suppressed Reference Records",
+        1,
+    )[0]
 
     assert "claim_medium" in priority_section
     assert "claim_low" not in priority_section
     assert "claim_bounded" not in priority_section
+    assert "claim_boundary" not in priority_section
     assert "claim_bounded" not in high_importance_section
+    assert "claim_boundary" in boundary_section
+    assert "claim_boundary" not in suppressed_section
     assert "claim_bounded" in suppressed_section

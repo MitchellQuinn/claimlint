@@ -76,7 +76,8 @@
         "narrow_or_remove_claim",
         "clarify_claim_wording",
         "human_review_required",
-        "ignore_low_quality_extraction"
+        "ignore_low_quality_extraction",
+        "keep_as_boundary_note"
       ]
     },
     "extraction_quality": {
@@ -99,6 +100,9 @@
         "workflow_instruction",
         "runtime_instruction",
         "adapter_instruction",
+        "frontmatter_metadata",
+        "roadmap_statement",
+        "boundary_statement",
         "other_low_quality"
       ]
     },

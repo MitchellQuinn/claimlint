@@ -70,7 +70,7 @@ This distinction is especially important for `bounded_non_claim`: a rights limit
 Each claim record includes:
 
 - `claim_importance`: `high`, `medium`, or `low`.
-- `review_action`: the recommended review treatment, such as adding evidence, narrowing a claim, clarifying wording, human review, keeping evidence linked, no action, or ignoring a low-quality extraction.
+- `review_action`: the recommended review treatment, such as adding evidence, narrowing a claim, clarifying wording, human review, keeping evidence linked, keeping a boundary note, no action, or ignoring a low-quality extraction.
 - `source_role`: whether the source file is a claim source, reference material, schema, workflow contract, runtime contract, adapter contract, example output, source code, or test fixture.
 - `is_auditable_claim`: whether the record should be treated as an auditable project claim for priority findings and remediation.
-- `extraction_quality`: whether the extracted text is an audit-ready claim, bounded context, caveat/scope note, policy statement, metric data point, taxonomy definition, verdict-rule definition, schema definition, workflow instruction, runtime instruction, adapter instruction, heading label, table header, incomplete fragment, code/config fragment, or other low-quality extraction.
+- `extraction_quality`: whether the extracted text is an audit-ready claim, boundary statement, roadmap statement, frontmatter metadata, bounded context, caveat/scope note, policy statement, metric data point, taxonomy definition, verdict-rule definition, schema definition, workflow instruction, runtime instruction, adapter instruction, heading label, table header, incomplete fragment, code/config fragment, or other low-quality extraction.
