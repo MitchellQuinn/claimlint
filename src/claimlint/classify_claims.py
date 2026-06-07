@@ -92,6 +92,8 @@ BOUNDED_DOMAIN_EVIDENCE: dict[str, list[str]] = {
 }
 
 SUPPRESSED_EXTRACTION_QUALITIES = {
+    "bounded_context",
+    "policy_statement",
     "taxonomy_definition",
     "verdict_rule_definition",
     "schema_definition",

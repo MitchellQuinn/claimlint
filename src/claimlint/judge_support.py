@@ -6,6 +6,8 @@ from .types import ClassifiedClaim
 
 
 NON_AUDITABLE_EXTRACTION_QUALITIES = {
+    "bounded_context",
+    "policy_statement",
     "taxonomy_definition",
     "verdict_rule_definition",
     "schema_definition",

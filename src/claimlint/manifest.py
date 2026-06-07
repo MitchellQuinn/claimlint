@@ -40,6 +40,14 @@ LEGACY_ROLE_SOURCE_ROLE_MAP = {
     "adapter_documentation": "adapter_contract",
     "adapter_status": "adapter_contract",
 }
+REFERENCE_PATH_SOURCE_ROLES = {
+    "docs/claim_taxonomy.md": "reference_only",
+    "docs/verdict_rules.md": "reference_only",
+    "docs/manifest_contract.md": "runtime_contract",
+    "docs/runtime_contract.md": "runtime_contract",
+    "docs/workflow_contract.md": "workflow_contract",
+    "docs/adapter_contract.md": "adapter_contract",
+}
 
 
 class ManifestError(ValueError):
@@ -80,15 +88,7 @@ def load_manifest(repo_path: str | Path, manifest_path: str | Path) -> ManifestS
             continue
 
         role = str(entry.get("role") or "unspecified")
-        source_role = str(
-            entry.get("source_role") or _source_role_from_legacy_role(role)
-        ).strip().lower()
-        extract_claims = _bool_setting(
-            entry,
-            "extract_claims",
-            default=source_role == "claim_source",
-        )
-        use_as_evidence = _bool_setting(entry, "use_as_evidence", default=True)
+        from_glob = "glob" in entry and "path" not in entry
         candidates: list[Path] = []
 
         if "path" in entry:
@@ -126,6 +126,19 @@ def load_manifest(repo_path: str | Path, manifest_path: str | Path) -> ManifestS
             if size_bytes > max_file_bytes:
                 warnings.append(f"File exceeds max_file_bytes and was skipped: {rel}")
                 continue
+            source_role = _source_role_for_candidate(
+                entry,
+                role=role,
+                rel_path=rel,
+                from_glob=from_glob,
+            )
+            path_protected = from_glob and _source_role_from_path(rel) != "claim_source"
+            extract_claims = _extract_claims_setting(
+                entry,
+                source_role=source_role,
+                path_protected=path_protected,
+            )
+            use_as_evidence = _bool_setting(entry, "use_as_evidence", default=True)
             selected.setdefault(
                 rel,
                 InputFile(
@@ -174,6 +187,48 @@ def _source_role_from_legacy_role(role: str) -> str:
     if normalized in SOURCE_ROLES:
         return normalized
     return LEGACY_ROLE_SOURCE_ROLE_MAP.get(normalized, "claim_source")
+
+
+def _source_role_for_candidate(
+    entry: dict[str, Any],
+    *,
+    role: str,
+    rel_path: str,
+    from_glob: bool,
+) -> str:
+    path_role = _source_role_from_path(rel_path)
+    if "source_role" in entry:
+        explicit_role = str(entry["source_role"]).strip().lower()
+        if from_glob and explicit_role == "claim_source" and path_role != "claim_source":
+            return path_role
+        return explicit_role
+    if path_role != "claim_source":
+        return path_role
+    return _source_role_from_legacy_role(role)
+
+
+def _source_role_from_path(rel_path: str) -> str:
+    rel = rel_path.replace("\\", "/").lower()
+    if rel in REFERENCE_PATH_SOURCE_ROLES:
+        return REFERENCE_PATH_SOURCE_ROLES[rel]
+    if rel.startswith("schemas/") and rel.endswith(".json"):
+        return "schema_reference"
+    if rel.startswith("workflows/") and rel.endswith((".yml", ".yaml")):
+        return "workflow_contract"
+    if rel.startswith("adapters/") and rel.endswith("/readme.md"):
+        return "adapter_contract"
+    return "claim_source"
+
+
+def _extract_claims_setting(
+    entry: dict[str, Any],
+    *,
+    source_role: str,
+    path_protected: bool,
+) -> bool:
+    if path_protected:
+        return False
+    return _bool_setting(entry, "extract_claims", default=source_role == "claim_source")
 
 
 def _bool_setting(entry: dict[str, Any], key: str, *, default: bool) -> bool:

@@ -28,6 +28,14 @@ maps directly to a contract/reference role. If `extract_claims` is omitted, it
 defaults to `true` for `claim_source` and `false` for other source roles.
 `use_as_evidence` defaults to `true`.
 
+Known reference and contract paths are protected when selected by broad globs:
+`docs/claim_taxonomy.md` and `docs/verdict_rules.md` default to
+`reference_only`, `schemas/**/*.json` defaults to `schema_reference`,
+`workflows/**/*.yml` defaults to `workflow_contract`, and runtime/adapter
+contract documents default to their matching contract roles. These protected
+paths are not extracted from broad globs unless they are selected by an explicit
+path entry for auditing.
+
 Files with `extract_claims: false` are not candidate claim sources, but they may
 still be chunked, indexed, and used as evidence when `use_as_evidence: true`.
 Claims, chunks, run-manifest entries, and claim records preserve `source_role`.

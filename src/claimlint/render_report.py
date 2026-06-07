@@ -39,6 +39,8 @@ VERDICT_ORDER = [
     "supported",
 ]
 LOW_QUALITY_EXTRACTIONS = {
+    "bounded_context",
+    "policy_statement",
     "heading_or_label",
     "heading_label",
     "table_header",
@@ -54,6 +56,28 @@ LOW_QUALITY_EXTRACTIONS = {
     "runtime_instruction",
     "adapter_instruction",
 }
+PRIORITY_EXCLUDED_EXTRACTIONS = {
+    "bounded_context",
+    "policy_statement",
+    "taxonomy_definition",
+    "verdict_rule_definition",
+    "schema_definition",
+    "workflow_instruction",
+    "runtime_instruction",
+    "adapter_instruction",
+    "heading_label",
+    "table_header",
+    "incomplete_fragment",
+    "code_or_config_fragment",
+}
+HIGH_IMPACT_DOMAINS = {
+    "licensing_rights",
+    "dataset_redistribution",
+    "artifact_distribution",
+    "model_performance",
+    "generalisation_scope",
+}
+CRITICAL_VERDICTS = {"overclaimed", "unsupported"}
 NON_ACTIONS = {
     "no_action",
     "keep_evidence_linked",
@@ -102,10 +126,10 @@ def _claims_report(claim_records: list[dict], run_manifest: dict) -> str:
 
 
 def _executive_summary(claim_records: list[dict], run_manifest: dict) -> list[str]:
-    auditable_records = [record for record in claim_records if _is_auditable_record(record)]
+    auditable_records = [record for record in claim_records if _is_visible_audit_record(record)]
     action_count = sum(1 for record in claim_records if _requires_action(record))
     high_count = sum(1 for record in auditable_records if record["claim_importance"] == "high")
-    demoted_count = sum(1 for record in claim_records if not _is_auditable_record(record))
+    demoted_count = sum(1 for record in claim_records if _is_suppressed_record(record))
     lines = [
         "## Executive Summary",
         "",
@@ -172,14 +196,14 @@ def _domain_summary(claim_records: list[dict]) -> list[str]:
         return lines
     for domain, label in _ordered_domains(claim_records):
         records = [record for record in claim_records if record["claim_domain"] == domain]
-        auditable_count = sum(1 for record in records if _is_auditable_record(record))
+        auditable_count = sum(1 for record in records if _is_visible_audit_record(record))
         high_count = sum(
             1
             for record in records
-            if _is_auditable_record(record) and record["claim_importance"] == "high"
+            if _is_visible_audit_record(record) and record["claim_importance"] == "high"
         )
         action_count = sum(1 for record in records if _requires_action(record))
-        demoted_count = sum(1 for record in records if not _is_auditable_record(record))
+        demoted_count = sum(1 for record in records if _is_suppressed_record(record))
         lines.append(
             f"| {label} | {len(records)} | {auditable_count} | {high_count} | {action_count} | {demoted_count} |"
         )
@@ -191,7 +215,7 @@ def _priority_findings(claim_records: list[dict]) -> list[str]:
     findings = [
         record
         for record in sorted(claim_records, key=_priority_sort_key)
-        if _requires_action(record) and _is_auditable_record(record) and not _is_low_quality(record)
+        if _is_priority_finding(record)
     ]
     lines = ["## Priority Findings", ""]
     if not findings:
@@ -213,8 +237,7 @@ def _high_importance_actions(claim_records: list[dict]) -> list[str]:
         if (
             record["claim_importance"] == "high"
             and _requires_action(record)
-            and _is_auditable_record(record)
-            and not _is_low_quality(record)
+            and _is_visible_audit_record(record)
         )
     ]
     lines = [
@@ -254,7 +277,7 @@ def _claims_grouped_by_domain(claim_records: list[dict]) -> list[str]:
         visible_records = [
             record
             for record in records
-            if _is_auditable_record(record) and not _is_low_quality(record)
+            if _is_visible_audit_record(record)
         ]
         demoted_count = len(records) - len(visible_records)
         lines.extend([f"### {label}", ""])
@@ -272,7 +295,7 @@ def _claims_grouped_by_domain(claim_records: list[dict]) -> list[str]:
 
 
 def _suppressed_reference_records(claim_records: list[dict]) -> list[str]:
-    records = [record for record in claim_records if not _is_auditable_record(record)]
+    records = [record for record in claim_records if _is_suppressed_record(record)]
     lines = ["## Suppressed Reference Records", ""]
     if not records:
         lines.extend(["No suppressed reference or low-quality records.", ""])
@@ -331,7 +354,7 @@ def _full_claim_listing(claim_records: list[dict]) -> list[str]:
 
 
 def _remediation_tasks(claim_records: list[dict]) -> str:
-    claim_records = [record for record in claim_records if _is_auditable_record(record)]
+    claim_records = [record for record in claim_records if _is_visible_audit_record(record)]
     groups = ["unsupported", "overclaimed", "partially_supported", "needs_human_review", "ambiguous", "supported"]
     lines = ["# ClaimLint Remediation Tasks", ""]
     if not claim_records:
@@ -358,7 +381,7 @@ def _remediation_tasks(claim_records: list[dict]) -> str:
 
 
 def _evidence_packet(claim_records: list[dict]) -> str:
-    claim_records = [record for record in claim_records if _is_auditable_record(record)]
+    claim_records = [record for record in claim_records if _is_visible_audit_record(record)]
     lines = ["# ClaimLint Evidence Packet", ""]
     if not claim_records:
         lines.extend(
@@ -416,7 +439,7 @@ def _domain_label(domain: str) -> str:
 
 
 def _requires_action(record: dict) -> bool:
-    if not _is_auditable_record(record):
+    if _is_suppressed_record(record):
         return False
     return record["review_action"] not in NON_ACTIONS
 
@@ -428,6 +451,36 @@ def _is_low_quality(record: dict) -> bool:
 def _is_auditable_record(record: dict) -> bool:
     return bool(
         record.get("is_auditable_claim", record.get("source_role", "claim_source") == "claim_source")
+    )
+
+
+def _is_visible_audit_record(record: dict) -> bool:
+    return _is_auditable_record(record) and not _is_suppressed_record(record)
+
+
+def _is_suppressed_record(record: dict) -> bool:
+    return (
+        not _is_auditable_record(record)
+        or record["extraction_quality"] in PRIORITY_EXCLUDED_EXTRACTIONS
+        or _is_low_quality(record)
+    )
+
+
+def _is_priority_finding(record: dict) -> bool:
+    if not _requires_action(record):
+        return False
+    if record["claim_importance"] == "low" and not _is_critical_high_impact_failure(record):
+        return False
+    return True
+
+
+def _is_critical_high_impact_failure(record: dict) -> bool:
+    return (
+        record["verdict"] in CRITICAL_VERDICTS
+        and (
+            record["claim_surface_status"] in {"high_claim_surface", "requires_external_environment"}
+            or record["claim_domain"] in HIGH_IMPACT_DOMAINS
+        )
     )
 
 
