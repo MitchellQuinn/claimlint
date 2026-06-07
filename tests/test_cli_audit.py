@@ -18,9 +18,12 @@ REQUIRED_OUTPUTS = [
 
 def test_cli_audit_writes_required_outputs(tmp_path):
     repo = FIXTURES / "small_repo"
-    out = tmp_path / "run"
-    exit_code = main(["audit", "--repo", str(repo), "--manifest", str(repo / "input_manifest.yml"), "--out", str(out)])
+    out_root = tmp_path / "output-root"
+    exit_code = main(
+        ["audit", "--repo", str(repo), "--manifest", str(repo / "input_manifest.yml"), "--out", str(out_root)]
+    )
     assert exit_code == 0
+    out = _single_timestamped_output_dir(out_root, repo.name)
     for filename in REQUIRED_OUTPUTS:
         assert (out / filename).exists()
     with (out / "claims.jsonl").open(encoding="utf-8") as handle:
@@ -63,11 +66,24 @@ def test_cli_audit_writes_required_outputs(tmp_path):
     assert positions == sorted(positions)
 
 
+def test_cli_audit_defaults_to_output_root(tmp_path, monkeypatch):
+    repo = FIXTURES / "low_claim_repo"
+    monkeypatch.chdir(tmp_path)
+    exit_code = main(["audit", "--repo", str(repo), "--manifest", str(repo / "input_manifest.yml")])
+    assert exit_code == 0
+    out = _single_timestamped_output_dir(tmp_path / "output", repo.name)
+    for filename in REQUIRED_OUTPUTS:
+        assert (out / filename).exists()
+
+
 def test_low_claim_repo_writes_no_claim_outputs(tmp_path):
     repo = FIXTURES / "low_claim_repo"
-    out = tmp_path / "run"
-    exit_code = main(["audit", "--repo", str(repo), "--manifest", str(repo / "input_manifest.yml"), "--out", str(out)])
+    out_root = tmp_path / "output-root"
+    exit_code = main(
+        ["audit", "--repo", str(repo), "--manifest", str(repo / "input_manifest.yml"), "--out", str(out_root)]
+    )
     assert exit_code == 0
+    out = _single_timestamped_output_dir(out_root, repo.name)
     for filename in REQUIRED_OUTPUTS:
         assert (out / filename).exists()
     manifest = json.loads((out / "run_manifest.json").read_text(encoding="utf-8"))
@@ -94,3 +110,12 @@ def _assert_posix_relative_paths(manifest):
         assert "\\" not in value
         assert not value.startswith("/")
         assert not re.match(r"^[A-Za-z]:/", value)
+
+
+def _single_timestamped_output_dir(out_root: Path, repo_name: str) -> Path:
+    output_dirs = list(out_root.glob(f"{repo_name}-*"))
+    assert len(output_dirs) == 1
+    out = output_dirs[0]
+    assert out.is_dir()
+    assert re.fullmatch(rf"{re.escape(repo_name)}-\d{{8}}-\d{{4}}Z", out.name)
+    return out

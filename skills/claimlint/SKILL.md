@@ -38,8 +38,7 @@ If the CLI is available, run:
 ```bash
 claimlint audit \
   --repo /path/to/repository \
-  --manifest /path/to/input_manifest.yml \
-  --out /path/to/output_dir
+  --manifest /path/to/input_manifest.yml
 ```
 
 If the CLI is not available, perform the workflow manually and emit outputs matching the same schema and file names.
@@ -71,4 +70,3 @@ Do not present the audit as legal, compliance, safety, or scientific certificati
 Do not imply exhaustive repository auditing.
 Do not silently modify the target repository.
 Do not claim compatibility with an adapter unless tested.
-

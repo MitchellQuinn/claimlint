@@ -6,10 +6,10 @@ The CLI is the shared runtime surface.
 claimlint audit \
   --repo /path/to/repository \
   --manifest /path/to/input_manifest.yml \
-  --out /path/to/output_dir
+  [--out /path/to/output_root]
 ```
 
-The command must create the output directory if it does not exist.
+`--out` is optional and defaults to `output`. The command must create the output root if it does not exist and write required outputs to a timestamped child directory named `<repo-folder>-YYYYMMDD-HHMMZ`.
 
 ## Required outputs
 

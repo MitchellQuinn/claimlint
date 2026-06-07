@@ -29,9 +29,10 @@ It is not a legal, compliance, scientific, or safety certification tool. It does
 ```bash
 claimlint audit \
   --repo /path/to/repository \
-  --manifest /path/to/input_manifest.yml \
-  --out /path/to/output_dir
+  --manifest /path/to/input_manifest.yml
 ```
+
+`--out` is optional and defaults to `output`. Each audit writes to a timestamped folder under the output root, such as `output/bounded-monocular-perception-20260607-1718Z`.
 
 Required outputs:
 
@@ -63,4 +64,3 @@ A README metric claim may be `partially_supported` when a matching metric file e
 ## Future Stages
 
 Future work may add evaluated local backends, richer retrieval, benchmark evaluation, and LoRA-related experiments. Those are not part of v0.1.
-

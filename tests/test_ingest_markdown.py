@@ -19,13 +19,13 @@ def test_manifest_loads_fixture_files():
 
 
 def test_excludes_are_respected(tmp_path):
-    excluded = FIXTURE / "runs"
+    excluded = FIXTURE / "output"
     excluded.mkdir(exist_ok=True)
     ignored = excluded / "ignored.md"
     ignored.write_text("The ignored file supports nothing.", encoding="utf-8")
     try:
         selection = load_manifest(FIXTURE, FIXTURE / "input_manifest.yml")
-        assert "runs/ignored.md" not in [input_file.path for input_file in selection.input_files]
+        assert "output/ignored.md" not in [input_file.path for input_file in selection.input_files]
     finally:
         ignored.unlink(missing_ok=True)
         excluded.rmdir()

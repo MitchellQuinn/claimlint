@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from dataclasses import asdict
+from datetime import datetime, timezone
 from pathlib import Path
 
 from .classify_claims import classify_claims
@@ -21,6 +23,7 @@ EXIT_INVALID_ARGUMENTS = 1
 EXIT_MANIFEST_VALIDATION_FAILED = 2
 EXIT_SCHEMA_VALIDATION_FAILED = 3
 EXIT_RUNTIME_ERROR = 4
+DEFAULT_OUTPUT_ROOT = "output"
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -38,7 +41,11 @@ def build_parser() -> argparse.ArgumentParser:
     audit_parser = subparsers.add_parser("audit", help="Audit repository claims against selected evidence.")
     audit_parser.add_argument("--repo", required=True, help="Repository directory to audit.")
     audit_parser.add_argument("--manifest", required=True, help="Input manifest YAML path.")
-    audit_parser.add_argument("--out", required=True, help="Output directory.")
+    audit_parser.add_argument(
+        "--out",
+        default=DEFAULT_OUTPUT_ROOT,
+        help="Output root directory for timestamped audit folders. Defaults to 'output'.",
+    )
     return parser
 
 
@@ -46,7 +53,8 @@ def audit(args: argparse.Namespace) -> int:
     started_at = utc_now()
     repo = Path(args.repo)
     manifest = Path(args.manifest)
-    out_dir = Path(args.out)
+    out_root = Path(args.out)
+    out_dir = _timestamped_output_dir(out_root, repo, started_at)
 
     if not repo.exists() or not repo.is_dir():
         print(f"Invalid repository path: {repo}", file=sys.stderr)
@@ -92,7 +100,7 @@ def audit(args: argparse.Namespace) -> int:
             repo_path=repo,
             manifest_path=manifest,
             output_dir=out_dir,
-            command_args={"command": "audit", "repo": str(repo), "manifest": str(manifest), "out": str(out_dir)},
+            command_args={"command": "audit", "repo": str(repo), "manifest": str(manifest), "out": str(out_root)},
             input_files=selection.input_files,
             manifest_warnings=selection.warnings,
             claim_records=claim_records,
@@ -108,6 +116,22 @@ def audit(args: argparse.Namespace) -> int:
     except Exception as exc:
         print(f"Runtime error: {exc}", file=sys.stderr)
         return EXIT_RUNTIME_ERROR
+
+
+def _timestamped_output_dir(out_root: Path, repo: Path, started_at: str) -> Path:
+    repo_name = _safe_folder_name(repo.resolve().name)
+    timestamp = _minute_timestamp(started_at)
+    return out_root / f"{repo_name}-{timestamp}"
+
+
+def _safe_folder_name(name: str) -> str:
+    safe_name = re.sub(r"[^A-Za-z0-9._-]+", "-", name).strip(".-")
+    return safe_name or "repository"
+
+
+def _minute_timestamp(timestamp: str) -> str:
+    started = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+    return started.astimezone(timezone.utc).strftime("%Y%m%d-%H%MZ")
 
 
 def _write_debug(out_dir: Path, chunks: list, candidates: list, retrieval_trace: list[dict]) -> None:
