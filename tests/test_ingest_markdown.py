@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from clipboard_raccoon.ingest_markdown import ingest_files
-from clipboard_raccoon.manifest import load_manifest
+from claimlint.ingest_markdown import ingest_files
+from claimlint.manifest import load_manifest
 
 
 FIXTURE = Path(__file__).parent / "fixtures" / "small_repo"

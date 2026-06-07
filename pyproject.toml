@@ -1,5 +1,5 @@
 [project]
-name = "clipboard-raccoon"
+name = "claimlint"
 version = "0.1.0"
 description = "Evidence-bounded repository claim auditor"
 requires-python = ">=3.11"
@@ -9,7 +9,7 @@ dependencies = [
 ]
 
 [project.scripts]
-clipboard-raccoon = "clipboard_raccoon.cli:main"
+claimlint = "claimlint.cli:main"
 
 [project.optional-dependencies]
 dev = [

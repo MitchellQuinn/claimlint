@@ -1,8 +1,9 @@
 import json
+import re
 from pathlib import Path
 
-from clipboard_raccoon.cli import main
-from clipboard_raccoon.schemas import validate_claim_record
+from claimlint.cli import main
+from claimlint.schemas import validate_claim_record
 
 
 FIXTURES = Path(__file__).parent / "fixtures"
@@ -28,8 +29,15 @@ def test_cli_audit_writes_required_outputs(tmp_path):
             validate_claim_record(record)
             assert {"claim_domain", "claim_importance", "review_action", "extraction_quality"} <= set(record)
     manifest = json.loads((out / "run_manifest.json").read_text(encoding="utf-8"))
+    assert manifest["tool_name"] == "claimlint"
+    assert manifest["workflow_id"] == "claimlint.claim-audit"
     assert "verdict_counts" in manifest
+    assert manifest["repo_path"] == "."
+    assert manifest["manifest_path"] == "input_manifest.yml"
+    _assert_posix_relative_paths(manifest)
     report = (out / "claims_report.md").read_text(encoding="utf-8")
+    assert "- Repository: ." in report
+    assert "- Manifest: input_manifest.yml" in report
     headings = [
         "## Executive Summary",
         "## Verdict Summary",
@@ -57,3 +65,20 @@ def test_low_claim_repo_writes_no_claim_outputs(tmp_path):
     }
     report = (out / "claims_report.md").read_text(encoding="utf-8")
     assert "No substantial auditable repository claims were found" in report
+
+
+def _assert_posix_relative_paths(manifest):
+    path_values = [
+        manifest["repo_path"],
+        manifest["manifest_path"],
+        manifest["output_dir"],
+        manifest["command_args"]["repo"],
+        manifest["command_args"]["manifest"],
+        manifest["command_args"]["out"],
+        *manifest["outputs"].values(),
+        *(input_file["path"] for input_file in manifest["input_files"]),
+    ]
+    for value in path_values:
+        assert "\\" not in value
+        assert not value.startswith("/")
+        assert not re.match(r"^[A-Za-z]:/", value)

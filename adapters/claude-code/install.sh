@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-mkdir -p .claude/skills/clipboard-raccoon
-cp -R skills/clipboard-raccoon/* .claude/skills/clipboard-raccoon/
+mkdir -p .claude/skills/claimlint
+cp -R skills/claimlint/* .claude/skills/claimlint/
 
-echo "Installed ClaimLint skill to .claude/skills/clipboard-raccoon"
+echo "Installed ClaimLint skill to .claude/skills/claimlint"
 

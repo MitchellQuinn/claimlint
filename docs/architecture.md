@@ -16,7 +16,7 @@ ClaimLint v0.1 is organized around four separate layers.
 
 ## Implementation
 
-`src/clipboard_raccoon/` implements the runtime contract with deterministic ingestion, extraction, retrieval, judgement, schema validation, and rendering.
+`src/claimlint/` implements the runtime contract with deterministic ingestion, extraction, retrieval, judgement, schema validation, and rendering.
 
 ## v0.1 backend stance
 

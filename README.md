@@ -27,7 +27,7 @@ It is not a legal, compliance, scientific, or safety certification tool. It does
 ## CLI
 
 ```bash
-clipboard-raccoon audit \
+claimlint audit \
   --repo /path/to/repository \
   --manifest /path/to/input_manifest.yml \
   --out /path/to/output_dir
@@ -48,7 +48,7 @@ ClaimLint keeps four layers separate:
 1. Workflow contract: `workflows/claim_audit.yml`
 2. Runtime contract: `docs/runtime_contract.md`
 3. Agent adapters: `adapters/`
-4. Implementation: `src/clipboard_raccoon/`
+4. Implementation: `src/claimlint/`
 
 The workflow file is the canonical description of the audit. Adapters point to that workflow and the shared runtime contract; they do not redefine either one.
 

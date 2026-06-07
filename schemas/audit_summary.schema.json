@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.com/clipboard-raccoon/audit_summary.schema.json",
+  "$id": "https://example.com/claimlint/audit_summary.schema.json",
   "title": "ClaimLint Audit Summary",
   "type": "object",
   "additionalProperties": false,

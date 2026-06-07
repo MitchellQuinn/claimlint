@@ -3,7 +3,7 @@
 The CLI is the shared runtime surface.
 
 ```bash
-clipboard-raccoon audit \
+claimlint audit \
   --repo /path/to/repository \
   --manifest /path/to/input_manifest.yml \
   --out /path/to/output_dir

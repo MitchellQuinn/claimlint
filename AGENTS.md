@@ -13,7 +13,7 @@ The canonical workflow is `workflows/claim_audit.yml`.
 
 The shared runtime contract is `docs/runtime_contract.md`.
 
-The implementation under `src/clipboard_raccoon/` must satisfy those contracts.
+The implementation under `src/claimlint/` must satisfy those contracts.
 
 Agent adapters under `adapters/` must not redefine the workflow or CLI.
 

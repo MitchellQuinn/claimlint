@@ -1,6 +1,6 @@
 import pytest
 
-from clipboard_raccoon.schemas import SchemaValidationError, validate_claim_record
+from claimlint.schemas import SchemaValidationError, validate_claim_record
 
 
 def valid_claim_record():

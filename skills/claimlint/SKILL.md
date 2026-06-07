@@ -1,5 +1,5 @@
 ---
-name: clipboard-raccoon
+name: claimlint
 description: Audit technical repository claims against repository evidence using structured claim records, support verdicts, missing evidence, artifact gaps, and remediation outputs.
 ---
 
@@ -36,7 +36,7 @@ Do not treat this skill file as the workflow source. This skill explains how to 
 If the CLI is available, run:
 
 ```bash
-clipboard-raccoon audit \
+claimlint audit \
   --repo /path/to/repository \
   --manifest /path/to/input_manifest.yml \
   --out /path/to/output_dir

@@ -1,10 +1,10 @@
 from pathlib import Path
 
-from clipboard_raccoon.classify_claims import classify_claims
-from clipboard_raccoon.extract_claims import extract_claims
-from clipboard_raccoon.ingest_markdown import ingest_files
-from clipboard_raccoon.manifest import load_manifest
-from clipboard_raccoon.retrieve_evidence import retrieve_evidence
+from claimlint.classify_claims import classify_claims
+from claimlint.extract_claims import extract_claims
+from claimlint.ingest_markdown import ingest_files
+from claimlint.manifest import load_manifest
+from claimlint.retrieve_evidence import retrieve_evidence
 
 
 FIXTURE = Path(__file__).parent / "fixtures" / "small_repo"

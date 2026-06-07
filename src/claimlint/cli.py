@@ -33,7 +33,7 @@ def main(argv: list[str] | None = None) -> int:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="clipboard-raccoon")
+    parser = argparse.ArgumentParser(prog="claimlint")
     subparsers = parser.add_subparsers(dest="command")
     audit_parser = subparsers.add_parser("audit", help="Audit repository claims against selected evidence.")
     audit_parser.add_argument("--repo", required=True, help="Repository directory to audit.")
@@ -83,7 +83,7 @@ def audit(args: argparse.Namespace) -> int:
 
         completed_at = utc_now()
         output_paths = {
-            key: str((out_dir / filename).resolve())
+            key: str(out_dir / filename)
             for key, filename in REQUIRED_OUTPUTS.items()
         }
         run_manifest = build_run_manifest(
@@ -126,4 +126,3 @@ def _write_jsonl(path: Path, rows: list[dict]) -> None:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
