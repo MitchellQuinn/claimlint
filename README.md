@@ -1,6 +1,8 @@
 # ClaimLint
 
-ClaimLint turns repository claims into structured, checkable evidence objects.
+ClaimLint is an agentic audit workflow for turning repository claims into structured, checkable evidence objects.
+
+The canonical audit behavior is defined in `workflows/claim_audit.yml` and executed through the shared runtime contract in `docs/runtime_contract.md`. The CLI implementation runs that workflow over a manifest-selected corpus; agent adapters under `adapters/` are thin entry points that point agents at the same workflow rather than redefining it.
 
 v0.1 is a small, deterministic repository claim auditor. It reads selected repository documentation and artifacts, extracts explicit claims, searches the selected corpus for evidence, records missing evidence and artifact gaps, and renders JSONL plus Markdown outputs.
 
