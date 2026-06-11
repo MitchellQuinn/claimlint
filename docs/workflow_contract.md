@@ -21,6 +21,8 @@ The workflow audits selected technical repository documentation and artifacts fo
 
 When an agent materializes the target repository by cloning it for this workflow, it must delete stale entries from `./tmp` before cloning so prior run state cannot contaminate the audit.
 
+For remote Git repositories, prefer the shared CLI materialization wrapper `claimlint audit-remote` instead of ad hoc agent cloning. The wrapper controls temporary worktree location, output location, provenance recording, and cleanup while delegating to the same workflow.
+
 ## Stages
 
 1. Ingest files from the manifest.

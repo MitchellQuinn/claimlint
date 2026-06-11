@@ -44,6 +44,23 @@ Required outputs:
 - `evidence_packet.md`
 - `run_manifest.json`
 
+For an explicit remote Git repository, use the materialization wrapper:
+
+```bash
+claimlint audit-remote https://github.com/org/repo \
+  --manifest input_manifest.yml
+```
+
+`audit-remote` prompts for temporary clone and output roots in interactive use. The default suggestions are under `~/.claimlint/<repo-name>/worktrees` and `~/.claimlint/<repo-name>/runs`. The cloned worktree is deleted after the audit unless `--keep-worktree` is passed.
+
+If the remote repository does not have a manifest yet, omit `--manifest` and ClaimLint creates a temporary starter manifest:
+
+```bash
+claimlint audit-remote https://github.com/org/repo
+```
+
+Generated manifests are written inside the temporary clone and copied into the report directory as `input_manifest.yml`. They are starter corpus selections, not exhaustive repository crawls.
+
 ## Architecture
 
 ClaimLint keeps four layers separate:

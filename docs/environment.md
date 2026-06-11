@@ -19,6 +19,8 @@ The implementation does not perform broad repository crawling outside manifest-s
 
 ClaimLint v0.1 has no required network, hosted API, or model service dependency. The default audit path uses deterministic local code for ingestion, claim extraction, classification, evidence retrieval, judgement, rendering, schema validation, and run-manifest creation.
 
+`claimlint audit-remote` requires a local `git` executable. Network access is needed only when the explicit repository URL requires it, such as `https://github.com/org/repo`. Local Git repository paths can be used without network access.
+
 The repository contains a model backend abstraction for future work, but v0.1 does not require a hosted model API, a local open-weight model backend, API credentials, fine tuning, or external inference services.
 
 ## External Environment Limitations

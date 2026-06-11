@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-mkdir -p .agents/skills/claimlint
-cp -R skills/claimlint/* .agents/skills/claimlint/
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd -- "${SCRIPT_DIR}/../.." && pwd)"
+SOURCE_DIR="${REPO_ROOT}/skills/claimlint"
+TARGET_DIR="${REPO_ROOT}/.agents/skills/claimlint"
 
-echo "Installed ClaimLint skill to .agents/skills/claimlint"
+mkdir -p "${TARGET_DIR}"
+cp -R "${SOURCE_DIR}/." "${TARGET_DIR}/"
 
+echo "Installed ClaimLint skill to ${TARGET_DIR}"

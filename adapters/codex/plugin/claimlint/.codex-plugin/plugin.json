@@ -1,0 +1,29 @@
+{
+  "name": "claimlint",
+  "version": "0.1.0",
+  "description": "Run local and remote ClaimLint audits from Codex using the shared CLI and canonical workflow contract.",
+  "author": {
+    "name": "ClaimLint"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "claimlint",
+    "claim-audit",
+    "evidence",
+    "codex"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "ClaimLint",
+    "shortDescription": "Audit repository claims against selected evidence.",
+    "longDescription": "Adds a Codex skill that runs local ClaimLint audits and controlled remote Git materialization through the shared CLI without redefining the workflow.",
+    "developerName": "ClaimLint",
+    "category": "Productivity",
+    "capabilities": [
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Run ClaimLint on this repository."
+    ]
+  }
+}
