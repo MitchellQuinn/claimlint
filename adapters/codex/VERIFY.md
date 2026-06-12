@@ -98,4 +98,6 @@ Also confirm `run_manifest.json` reports:
 
 ## Status update rule
 
-Only update `adapters/status.yml` from `untested` after the Codex smoke prompt succeeds end to end in an actual Codex session. A direct CLI test is useful implementation evidence, but it is not adapter compatibility evidence by itself.
+`adapters/status.yml` may say `tested` only when a Codex smoke prompt succeeds end to end in an actual Codex session and the evidence is recorded. The local-audit smoke evidence is recorded in `adapters/codex/SMOKE.md`.
+
+A direct CLI test is useful implementation evidence, but it is not adapter compatibility evidence by itself. Do not claim a separate Codex GUI remote-materialization smoke unless one is separately recorded.

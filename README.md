@@ -74,7 +74,7 @@ The workflow file is the canonical description of the audit. Adapters point to t
 
 ## Adapter Status
 
-The initial Codex and Claude Code adapter files are present but untested. See `adapters/status.yml`.
+The Codex adapter has a recorded local-audit smoke verification. Claude Code remains untested. See `adapters/status.yml`.
 
 ## Verdict Example
 

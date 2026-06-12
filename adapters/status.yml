@@ -1,6 +1,6 @@
 codex:
-  status: untested
-  notes: "Repo skill, local plugin package, and verification procedure are provided, but end-to-end Codex execution has not yet been verified."
+  status: tested
+  notes: "Codex local audit smoke verified on 2026-06-12 using the ClaimLint skill and shared CLI. See adapters/codex/SMOKE.md."
 
 claude_code:
   status: untested

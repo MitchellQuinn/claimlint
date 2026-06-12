@@ -76,8 +76,19 @@ def test_codex_verification_docs_keep_out_default_contract():
         assert filename in verification
 
 
-def test_codex_adapter_status_remains_untested_until_end_to_end_run():
+def test_codex_adapter_status_references_recorded_smoke():
     status = yaml.safe_load((ROOT / "adapters" / "status.yml").read_text(encoding="utf-8"))
+    smoke = (CODEX_ADAPTER / "SMOKE.md").read_text(encoding="utf-8")
 
-    assert status["codex"]["status"] == "untested"
-    assert "end-to-end Codex execution" in status["codex"]["notes"]
+    assert status["codex"]["status"] == "tested"
+    assert "SMOKE.md" in status["codex"]["notes"]
+    assert "No `--out` argument was passed." in smoke
+    assert "claimlint audit --repo tests/fixtures/small_repo" in smoke
+    for filename in (
+        "claims.jsonl",
+        "claims_report.md",
+        "remediation_tasks.md",
+        "evidence_packet.md",
+        "run_manifest.json",
+    ):
+        assert filename in smoke

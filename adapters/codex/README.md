@@ -77,7 +77,7 @@ For arbitrary Git URLs without a user-supplied manifest path, omit `--manifest`;
 
 ## Verification
 
-Use `adapters/codex/VERIFY.md` for the Codex smoke-test procedure. The adapter remains untested until an end-to-end Codex run has verified that the CLI produces:
+Use `adapters/codex/VERIFY.md` for the Codex smoke-test procedure. The recorded local-audit Codex smoke is in `adapters/codex/SMOKE.md`; a valid run verifies that the CLI produces:
 
 - `claims.jsonl`
 - `claims_report.md`
@@ -85,4 +85,4 @@ Use `adapters/codex/VERIFY.md` for the Codex smoke-test procedure. The adapter r
 - `evidence_packet.md`
 - `run_manifest.json`
 
-Status: untested. Do not claim Codex compatibility until an end-to-end Codex adapter run has been verified.
+Status: tested for the local audit adapter smoke. Do not claim a separate Codex GUI remote-materialization smoke unless one is separately recorded.
